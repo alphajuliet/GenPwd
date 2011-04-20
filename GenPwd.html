@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html> 
+	<head> 
+		<title>GenPwd</title> 
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+		<script type="text/javascript">
+		<!--
+		Info = {
+				name: "GenPwd",
+				author: "AndrewJ", 
+				version: "2.9",
+				date: "2011-04-14",
+				info: "GenPwd is a very simple password generator.",
+				appendTo: function(tagName) {
+					var str = "<p>";
+					str += "<span class='title'>" + this.name + "</span>";
+					str += "&nbsp;<span class='description'>v" + this.version + "</span>";
+					str += "</p>";
+					$(tagName).append(str);
+				},
+				aboutText: function() {
+					str = this.name + " v" + this.version;
+					str += ", last modified: " + this.date;
+					str += " by: " + this.author + ".\n\n";
+					str += this.info;
+					return str;
+				}
+			}
+			
+			var nwords = 10;
+			
+			// Capitalise a string
+			String.prototype.capitalise = function () {
+				return this.substr(0,1).toUpperCase() + this.substr(1);
+			}
+			
+			// Generate a random number between 0 and n-1
+			Math.randomN = function (n) {
+				return Math.floor(n*Math.random());
+			}
+			
+			// Return a random element from an array
+			Array.prototype.random = function () {
+				return this[Math.randomN(this.length)];
+			}
+			
+			// Utility function			
+			doTimes = function (n, fn) {
+				for (var i=0; i<n; i++)
+					fn();
+				return n;
+			}
+				
+			RandomList = function (t) {
+				return function () {
+					return t.random();
+				}
+			},
+			
+			WeightedList = function (t) {
+				var expandedList = [];
+				$.each(t, function (key, value) {
+					doTimes(value, function () {
+						expandedList.push(key);
+					});
+				});
+				// alert(expandedList); // debug
+				return function () {
+					return expandedList.random();
+				}
+			},
+				
+			//---------------------------------
+			// Namespace: GenPwd
+			GenPwd = {
+				
+				// 
+				// Components
+				generators: {
+					c1: WeightedList({"b":2,"bl":1,"br":1,"cr":1,"ch":2,"cl":1,"d":2,"f":2,"fl":1,"fr":1,"g":2,"gl":1,"gr":1,"h":1,"j":2,"k":2,"l":2,"m":3,"n":2,"p":2,"pl":1,"pr":1,"qu":1,"r":2,"s":3,"sh":2,"sk":1,"sl":1,"sm":1,"sn":1,"st":2,"str":1,"t":3,"th":2,"thr":1,"tr":2,"tw":1,"v":2,"w":1,"z":2}),
+					c2: RandomList(["b","bl","br","cr","ch","cl","d","f","fl","fr","g","gg", "gl","gr","h","j","k","l","m","n","p","pl","pp","pr","qu","r","s","sh","sk","sl","sm","sn","st","str","t","th","thr","tr","tw","v","w","z"]),
+					c3: WeightedList({"b":1,"ch":1,"ck":1,"ct":1,"d":2,"dd":1,"f":1,"ff":1,"ft":1,"g":1,"k":1,"l":2,"ll":1,"lb":1,"ld":1,"lm":1,"ln":1,"lp":1,"lt":1,"m":3,"mp":1,"mt":1,"n":3,"nd":1,"ng":1,"nn":1,"nt":1,"p":2,"pp":1,"pt":1,"rd":1,"rg":1,"rk":1,"rn":1,"rr":1,"rs":1,"rt":1,"s":3,"sh":1,"ss":2,"st":2,"t":3,"tt":2,"th":2}),
+					v1: WeightedList({"a":5,"ai":1,"e":5,"ea":1,"i":5,"ia":1,"o":5,"oi":1,"oo":2,"u":2}),
+					v2: WeightedList({"a":5, "e":5, "i":5, "ia":1, "o":5, "oa":1, "oo":2, "u":2, "ua":1}),
+					v3: WeightedList({"a":5,"ao":1,"e":5,"ee":2,"eo":1,"i":2,"ia":2, "io":2,"o":5, "oa":2, "oo":2,"ow":2,"ua":1, "uo":1,"y":5}),
+					p:   RandomList(["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"]),
+					test: WeightedList({"a": 5, "b": 1, "c": 2}),
+				},
+				
+				// Get the state of a form element
+				getState: function (id) {
+					return $(id).attr("checked");
+				},
+				
+				cap: function (s) {
+					return ($("#capitals").attr("checked")) ? s.capitalise() : s;
+				},
+				
+				punc: function () {
+					var R = GenPwd.generators;
+					return (GenPwd.getState("#punctuation")) ? R.p() : "";
+				},
+				
+				num: function () {
+					return (GenPwd.getState("#numbers")) ? Math.randomN(99) : "";
+				},
+				
+				randomWord: function () {
+					var R = this.generators;
+					var punc = this.punc;
+					var cap = this.cap;
+					var num = this.num;
+					var w = "";
+					c = Math.randomN(7);
+					switch (c) {
+						case 0:  w = R.c1() + R.v1() + punc() + cap(R.c1()) + R.v2() + R.c3() + num(); break;
+						case 1:  w = R.v1() + cap(R.c1()) + punc() + R.v2() + R.c3() + num(); break;
+						case 2:  w = R.c1() + R.v1() + punc() + num() + cap(R.c3()) + R.v3(); break;
+						case 3:  w = R.c1() + R.v1() + cap(R.c3()) + R.v3() + punc() + num(); break;
+						case 4:  w = num() + R.c1() + R.v1() + cap(R.c1()) + R.v2() + R.c3() + punc(); break;
+						case 5:  w = num() + punc() + cap(R.c1()) + R.v2() + R.c3() + R.v3(); break;
+						case 6:  w = R.c1() + R.v1() + cap(R.c3()) + punc() + R.v1() + R.c3() + num(); break;
+						default: w = R.c1() + R.v1() + punc() + num() + cap(R.c3()) + R.v3(); break;
+					}
+					// return c + ": " + w;
+					return w;
+				},
+				
+				// Public methods
+				generate: function () {
+					$("#output").empty();
+					for (var i=0; i < nwords; i++) {
+						$("#output").append(this.randomWord());
+						$("#output").append("<br/>");
+					}
+				},
+				
+				initialise: function () {
+					Info.appendTo("#header");
+				}		
+			}			
+			
+			// $(GenPwd.initialise);
+			$(document).ready(function() {
+					GenPwd.initialise()
+			});
+			
+        -->
+		</script> 
+		<noscript><p>GenPwd requires JavaScript to be enabled</p></noscript> 
+        
+        <style type="text/css"> 
+		<!--
+        	body { font-family: Optima, Helvetica, Arial, sans-serif; font-size: 10pt; width: 100%; padding: 5px; color: #333300; }
+			#header { border-bottom: 1px solid #666600; }
+			#container { padding-top: 10pt; }
+        	#output { margin-top: 10pt; }
+			#controls {padding: 2pt 5pt; background-color: #ccccff; }
+			#controls span { padding-right: 5pt; }
+			#output { border: 1px solid #cccccc; padding: 2pt 5pt; }
+			.title { font-size: 150%; font-weight: bold; }
+			.button { background-color: #9f9; border: solid 1px #666; }
+			@media screen {
+				body { max-width: 350px;  }
+			}
+			@media handheld {
+				body { -webkit-text-size-adjust:none; padding: 5px; }
+				div { width: 100%!important; margin: 0!important; }
+				margin:
+			}
+        -->
+        </style>
+       
+		<meta name="viewport" content="width=device-width" />
+	</head> 
+	<body> 
+		<div id="header"> 
+		</div> 
+		<div id="container"> 
+			<div id="controls"> 
+				<span><input type="checkbox" id="punctuation" value="true"/> Punctuation</span> 
+				<span><input type="checkbox" id="numbers" value="true"/> Numbers </span>
+				<span><input type="checkbox" id="capitals" value="true"/> Capitals </span> 
+				<span><input class="button" type="button" value="Go!" onclick="GenPwd.generate();"/></span> 
+			</div> 
+			<div id="output"><p>Click on Go!</p></div> 
+		</div> 
+		<div id="footer"> 
+		</div> 
+	</body> 
+</html>
