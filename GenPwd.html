@@ -36,7 +36,7 @@
 			
 			// Generate a random number between 0 and n-1
 			Math.randomN = function (n) {
-				return Math.floor(n*Math.random());
+				return Math.floor(n * Math.random());
 			}
 			
 			// Return a random element from an array
@@ -69,14 +69,13 @@
 					return expandedList.random();
 				}
 			},
-				
+			
 			//---------------------------------
 			// Namespace: GenPwd
 			GenPwd = {
-				// 
-				// Components
 				
-				generators: {
+				// Generators
+				generator1: {	
 					c1: WeightedList({"b":2,"bl":1,"br":1,"c":2,"cr":1,"ch":2,"cl":1,"d":2,"f":2,"fl":1,"fr":1,"g":2,"gl":1,"gr":1,"h":1,"j":2,"k":2,"l":2,"m":3,"n":2,"p":2,"pl":1,"pr":1,"qu":1,"r":2,"s":3,"sh":2,"sk":1,"sl":1,"sm":1,"sn":1,"st":2,"str":1,"t":3,"th":2,"thr":1,"tr":2,"tw":1,"v":2,"w":1,"z":2}),
 					c2: RandomList(["b","bl","br","cr","ch","cl","d","f","fl","fr","g","gg", "gl","gr","h","j","k","l","m","n","p","pl","pp","pr","pt","qu","r","s","sh","sk","sl","sm","sn","st","str","t","th","thr","tr","tw","v","w","z"]),
 					c3: WeightedList({"b":1,"ch":1,"ck":1,"ct":1,"d":2,"dd":1,"f":1,"ff":1,"ft":1,"g":1,"k":1,"l":2,"ll":1,"lb":1,"ld":1,"lm":1,"ln":1,"lp":1,"lt":1,"m":3,"mp":1,"mt":1,"n":3,"nd":1,"ng":1,"nn":1,"nt":1,"p":2,"pp":1,"pt":1,"rd":1,"rg":1,"rk":1,"rn":1,"rr":1,"rs":1,"rt":1,"s":3,"sh":1,"ss":2,"st":2,"t":3,"tt":2,"th":2,"v":2,"wn":1}),
@@ -84,53 +83,68 @@
 					v2: WeightedList({"a":5, "e":5, "i":5, "ia":1, "o":5, "oa":1, "oo":2, "u":2, "ua":1}),
 					v3: WeightedList({"a":5,"ao":1,"e":5,"ea":1,"ee":2,"eo":1,"i":2,"ia":2, "io":2,"o":5, "oa":2, "oo":2,"ow":2,"ua":1, "uo":1,"y":5}),
 					p:  RandomList(["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"]),
+					cap: function (s) { return ($("#capitals").attr("checked")) ? s.capitalise() : s; },
+					punc: function () { return (GenPwd.getState("#punctuation")) ? this.p() : ""; },
+					num: function () { return (GenPwd.getState("#numbers")) ? Math.randomN(99) : ""; },
+					randomWord: function () {
+						var R = this;
+						var w = "";
+						c = Math.randomN(8);
+						switch (c) {
+							case 0:  w = R.c1() + R.v1() + R.punc() + R.cap(R.c2()) + R.v2() + R.c3() + R.num(); break;
+							case 1:  w = R.v1() + R.cap(R.c1()) + R.punc() + R.v2() + R.c3() + R.num(); break;
+							case 2:  w = R.c1() + R.v1() + R.punc() + R.num() + R.cap(R.c3()) + R.v3(); break;
+							case 3:  w = R.v1() + R.c1() + R.v1() + R.cap(R.c3()) + R.v3() + R.punc() + R.num(); break;
+							case 4:  w = R.num() + R.c1() + R.v1() + R.cap(R.c1()) + R.v2() + R.c3() + R.punc(); break;
+							case 5:  w = R.num() + R.punc() + R.cap(R.c1()) + R.v2() + R.c3() + R.v3(); break;
+							case 6:  w = R.c1() + R.v1() + R.cap(R.c2()) + R.punc() + R.v2() + R.c3() + R.num(); break;
+													case 7:  w = R.c1() + R.v1() + R.num() + R.cap(R.c1()) + R.v1() + R.c1() + R.v1() + R.punc(); break
+							default: w = R.c1() + R.v1() + R.punc() + R.num() + R.cap(R.c3()) + R.v3(); break;
+						}
+						// return c + ": " + w;
+						return w;
+					},
 				},
 				
-    			randomWord: function () {
-					var R = this.generators;
-					var punc = this.punc;
-					var cap = this.cap;
-					var num = this.num;
-					var w = "";
-					c = Math.randomN(8);
-					switch (c) {
-						case 0:  w = R.c1() + R.v1() + punc() + cap(R.c2()) + R.v2() + R.c3() + num(); break;
-						case 1:  w = R.v1() + cap(R.c1()) + punc() + R.v2() + R.c3() + num(); break;
-						case 2:  w = R.c1() + R.v1() + punc() + num() + cap(R.c3()) + R.v3(); break;
-						case 3:  w = R.v1() + R.c1() + R.v1() + cap(R.c3()) + R.v3() + punc() + num(); break;
-						case 4:  w = num() + R.c1() + R.v1() + cap(R.c1()) + R.v2() + R.c3() + punc(); break;
-						case 5:  w = num() + punc() + cap(R.c1()) + R.v2() + R.c3() + R.v3(); break;
-						case 6:  w = R.c1() + R.v1() + cap(R.c2()) + punc() + R.v2() + R.c3() + num(); break;
-                        case 7:  w = R.c1() + R.v1() + num() + cap(R.c1()) + R.v1() + R.c1() + R.v1() + punc(); break
-						default: w = R.c1() + R.v1() + punc() + num() + cap(R.c3()) + R.v3(); break;
-					}
-					// return c + ": " + w;
-					return w;
+				// Pseudo-Japanese style
+				generator2: {
+					c1: WeightedList({"":2,"k":2,"g":2,"t":2,"d":2,"s":2,"z":2,"h":2,"b":1,"p":1,"n":2,"r":2,"m":2,"y":1,"gy":1,"j":1,"ch":1,"ry":1,"my":1,"by":1,"py":1}),
+					v1: WeightedList({"a":2,"i":1,"u":2,"e":1,"o":2}),
+					p:  RandomList(["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"]),
+					cap: function (s) { return ($("#capitals").attr("checked")) ? s.capitalise() : s; },
+					punc: function () { return (GenPwd.getState("#punctuation")) ? this.p() : ""; },
+					num: function () { return (GenPwd.getState("#numbers")) ? Math.randomN(99) : ""; },
+					randomWord: function () {
+						var R = this;
+						var w;
+						c = Math.randomN(3);
+						switch (c) {
+							case 0: w = R.c1() + R.v1() + R.punc() + R.cap(R.c1()) + R.v1() + R.c1() + R.v1() + R.num(); break;
+							case 1: w = R.c1() + R.v1() + "n" + R.punc() + R.cap(R.c1()) + R.v1() + R.c1() + R.v1() + R.num(); break;
+							case 2: w = R.c1() + R.v1() + R.punc() + R.c1() + R.v1() + R.cap(R.c1()) + R.v1() + "n" + R.num(); break;
+							default: w = R.c1() + R.v1() + "n";
+						}
+						w = w.replace(/ti/, "chi");
+						w = w.replace(/si/, "shi");
+						w = w.replace(/hu/, "fu");
+						w = w.replace(/tu/, "tsu");
+						w = w.replace(/(\wy)[ie]/, "$1o");
+						return w;
+					},
 				},
 				
+				// Public methods
+
 				// Get the state of a form element
 				getState: function (id) {
 					return $(id).attr("checked");
 				},
 				
-				cap: function (s) {
-					return ($("#capitals").attr("checked")) ? s.capitalise() : s;
-				},
-				
-				punc: function () {
-					var R = GenPwd.generators;
-					return (GenPwd.getState("#punctuation")) ? R.p() : "";
-				},
-				
-				num: function () {
-					return (GenPwd.getState("#numbers")) ? Math.randomN(99) : "";
-				},
-				
-				// Public methods
 				generate: function () {
+					var generator = eval("GenPwd." + $("#gen").val());
 					$("#output").empty();
 					for (var i=0; i < nwords; i++) {
-						$("#output").append(this.randomWord());
+						$("#output").append(generator.randomWord());
 						$("#output").append("<br/>");
 					}
 				},
@@ -149,19 +163,27 @@
 		</script> 
 		<noscript><p>GenPwd requires JavaScript to be enabled</p></noscript> 
         
-        <style type="text/css"> 
+    <style type="text/css"> 
 		<!--
-        	body { font-family: Optima, Helvetica, Arial, sans-serif; font-size: 10pt; width: 100%; padding: 5px; color: #333300; }
-			#header { border-bottom: 1px solid #666600; }
+      body { 
+      	font-family: Helvetica Neue, Geneva, Arial, sans-serif; 
+      	font-weight: lighter;
+      	font-size: 10pt;
+      	width: 100%; 
+      	padding: 5px; 
+      	color: #333300; 
+      }
+			#header { border-bottom: 1px solid #999900; }
 			#container { padding-top: 10pt; }
-        	#output { margin-top: 10pt; }
-			#controls {padding: 2pt 5pt; background-color: #ccccff; }
+      #output { margin-top: 10pt; border: 1px solid #cccccc; padding: 2pt 5pt; }
+			#controls { padding: 2pt 5pt; background-color: #ccccff; }
 			#controls span { padding-right: 5pt; }
-			#output { border: 1px solid #cccccc; padding: 2pt 5pt; }
-			.title { font-size: 150%; font-weight: bold; }
+			.title { font-size: 150%; }
 			.button { background-color: #9f9; border: solid 1px #666; }
+			.button:hover { background-color: #dfd; }
+			.description { font-size: 80%; color: #ccc; }
 			@media screen {
-				body { max-width: 350px;  }
+				body { max-width: 450px;  }
 			}
 			@media handheld {
 				body { -webkit-text-size-adjust:none; padding: 5px; }
@@ -169,7 +191,7 @@
 				margin:
 			}
         -->
-        </style>
+    </style>
        
 		<meta name="viewport" content="width=device-width" />
 	</head> 
@@ -180,7 +202,13 @@
 			<div id="controls"> 
 				<span><input type="checkbox" id="punctuation" value="true"/> Punctuation</span> 
 				<span><input type="checkbox" id="numbers" value="true"/> Numbers </span>
-				<span><input type="checkbox" id="capitals" value="true"/> Capitals </span> 
+				<span><input type="checkbox" id="capitals" value="true"/> Capitals </span>
+				<span>
+					<select id="gen">
+						<option value="generator1" selected="true">generator1</option>
+						<option value="generator2">generator2</option>
+					</select>
+				</span>
 				<span><input class="button" type="button" value="Go!" onclick="GenPwd.generate();"/></span> 
 			</div> 
 			<div id="output"><p>Click on Go!</p></div> 
