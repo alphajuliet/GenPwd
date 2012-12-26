@@ -108,7 +108,7 @@
 				
 				// Pseudo-Japanese style
 				generator2: {
-					c1: WeightedList({"":2,"k":2,"g":2,"t":2,"d":2,"s":2,"z":2,"h":2,"b":1,"p":1,"n":2,"r":2,"m":2,"y":1,"gy":1,"j":1,"ch":1,"ry":1,"my":1,"by":1,"py":1}),
+					c1: WeightedList({"":2,"k":3,"g":3,"t":3,"d":3,"s":3,"z":3,"h":2,"b":2,"p":1,"n":2,"r":3,"m":3,"y":2,"gy":1,"j":1,"sh":1,"ch":1,"ky":1,"hy":1,"ry":1,"my":1,"ny":1,"by":1,"py":1}),
 					v1: WeightedList({"a":2,"i":1,"u":2,"e":1,"o":2}),
 					p:  RandomList(["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"]),
 					cap: function (s) { return ($("#capitals").attr("checked")) ? s.capitalise() : s; },
@@ -117,17 +117,21 @@
 					randomWord: function () {
 						var R = this;
 						var w;
-						c = Math.randomN(3);
+						c = Math.randomN(4);
 						switch (c) {
 							case 0: w = R.c1() + R.v1() + R.punc() + R.cap(R.c1()) + R.v1() + R.c1() + R.v1() + R.num(); break;
 							case 1: w = R.c1() + R.v1() + "n" + R.punc() + R.cap(R.c1()) + R.v1() + R.c1() + R.v1() + R.num(); break;
 							case 2: w = R.c1() + R.v1() + R.punc() + R.c1() + R.v1() + R.cap(R.c1()) + R.v1() + "n" + R.num(); break;
+							case 3: w = R.c1() + R.v1() + R.punc() + R.cap(R.c1()) + R.v1() + R.v1() + R.num(); break;
 							default: w = R.c1() + R.v1() + "n";
 						}
-						w = w.replace(/ti/, "chi");
-						w = w.replace(/si/, "shi");
-						w = w.replace(/hu/, "fu");
-						w = w.replace(/tu/, "tsu");
+						w = w.replace(/[Tt]i/, "chi");
+						w = w.replace(/[Ss]i/, "shi");
+						w = w.replace(/[Hh]u/, "fu");
+						w = w.replace(/[Cc]fu/, "chu"); // fix from the previous rule when it matches "chu"
+						w = w.replace(/[Ss]fu/, "shu"); // fix from the previous rule when it matches "shu"
+						w = w.replace(/[Tt]u/, "tsu");
+						w = w.replace(/[Ss]he/, "sho");
 						w = w.replace(/(\wy)[ie]/, "$1o");
 						return w;
 					},
