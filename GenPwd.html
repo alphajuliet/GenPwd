@@ -8,8 +8,8 @@
 		Info = {
 				name: "GenPwd",
 				author: "AndrewJ", 
-				version: "2.11",
-				date: "2012-12-27",
+				version: "2.12",
+				date: "2013-03-31",
 				info: "GenPwd is a very simple password generator.",
 				appendTo: function(tagName) {
 					var str = "<p>";
@@ -50,7 +50,12 @@
 					fn();
 				return n;
 			}
-				
+			
+			// Left zero pad numbers to 2 digits
+			pad2 = function (n) { 
+				return (n < 10 ? "0"+n : n);
+			}
+			
 			// List generators returning functions to call
 			RandomList = function (t) {
 				return function () {
@@ -85,7 +90,7 @@
 					p:  RandomList(["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"]),
 					cap: function (s) { return ($("#capitals").attr("checked")) ? s.capitalise() : s; },
 					punc: function () { return (GenPwd.getState("#punctuation")) ? this.p() : ""; },
-					num: function () { return (GenPwd.getState("#numbers")) ? Math.randomN(99) : ""; },
+					num: function () { return (GenPwd.getState("#numbers")) ? pad2(Math.randomN(99)) : ""; },
 					randomWord: function () {
 						var R = this;
 						var w = "";
@@ -98,7 +103,7 @@
 							case 4:  w = R.num() + R.c1() + R.v1() + R.cap(R.c1()) + R.v2() + R.c3() + R.punc(); break;
 							case 5:  w = R.num() + R.punc() + R.cap(R.c1()) + R.v2() + R.c3() + R.v3(); break;
 							case 6:  w = R.c1() + R.v1() + R.cap(R.c2()) + R.punc() + R.v2() + R.c3() + R.num(); break;
-													case 7:  w = R.c1() + R.v1() + R.num() + R.cap(R.c1()) + R.v1() + R.c1() + R.v1() + R.punc(); break
+							case 7:  w = R.c1() + R.v1() + R.num() + R.cap(R.c1()) + R.v1() + R.c1() + R.v1() + R.punc(); break
 							default: w = R.c1() + R.v1() + R.punc() + R.num() + R.cap(R.c3()) + R.v3(); break;
 						}
 						// return c + ": " + w;
@@ -108,12 +113,12 @@
 				
 				// Pseudo-Japanese style
 				generator2: {
-					c1: WeightedList({"":2,"k":3,"g":3,"t":3,"d":3,"s":3,"z":3,"h":2,"b":2,"p":1,"n":2,"r":3,"m":3,"y":2,"gy":1,"j":1,"sh":1,"ch":1,"ky":1,"hy":1,"ry":1,"my":1,"ny":1,"by":1,"py":1}),
+					c1: WeightedList({"k":5,"g":5,"t":5,"d":5,"s":5,"z":4,"h":2,"b":2,"p":1,"n":3,"r":5,"m":3,"y":2,"gy":1,"j":1,"sh":1,"ch":1,"ky":1,"hy":1,"ry":1,"my":1,"ny":1,"by":1,"py":1}),
 					v1: WeightedList({"a":2,"i":1,"u":2,"e":1,"o":2}),
 					p:  RandomList(["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"]),
 					cap: function (s) { return ($("#capitals").attr("checked")) ? s.capitalise() : s; },
 					punc: function () { return (GenPwd.getState("#punctuation")) ? this.p() : ""; },
-					num: function () { return (GenPwd.getState("#numbers")) ? Math.randomN(99) : ""; },
+					num: function () { return (GenPwd.getState("#numbers")) ? pad2(Math.randomN(99)) : ""; },
 					randomWord: function () {
 						var R = this;
 						var w;
@@ -122,8 +127,8 @@
 							case 0: w = R.c1() + R.v1() + R.punc() + R.cap(R.c1()) + R.v1() + R.c1() + R.v1() + R.num(); break;
 							case 1: w = R.c1() + R.v1() + "n" + R.punc() + R.cap(R.c1()) + R.v1() + R.c1() + R.v1() + R.num(); break;
 							case 2: w = R.c1() + R.v1() + R.punc() + R.c1() + R.v1() + R.cap(R.c1()) + R.v1() + "n" + R.num(); break;
-							case 3: w = R.c1() + R.v1() + R.punc() + R.cap(R.c1()) + R.v1() + R.v1() + R.num(); break;
-							default: w = R.c1() + R.v1() + "n";
+							case 3: w = R.c1() + R.v1() + R.punc() + R.cap(R.c1()) + R.v1() + R.num(); break;
+							default: w = R.cap(R.c1()) + R.v1() + "n";
 						}
 						w = w.replace(/[Tt]i/, "chi");
 						w = w.replace(/[Ss]i/, "shi");
@@ -148,8 +153,9 @@
 					var generator = eval("GenPwd." + $("#gen").val());
 					$("#output").empty();
 					for (var i=0; i < nwords; i++) {
-						$("#output").append(generator.randomWord());
-						$("#output").append("<br/>");
+						elt = $("<div class='word'></div>").append(generator.randomWord());
+						$("#output").append(elt);
+						//$("#output").append("<br/>");
 					}
 				},
 				
@@ -163,7 +169,7 @@
 					GenPwd.initialise()
 			});
 			
-        -->
+    -->
 		</script> 
 		<noscript><p>GenPwd requires JavaScript to be enabled</p></noscript> 
         
@@ -173,21 +179,22 @@
       	font-family: Helvetica Neue, Geneva, Arial, sans-serif; 
       	font-weight: lighter;
       	font-size: 10pt;
-      	width: 100%; 
-      	padding: 5px; 
+      	width: 95%;
       	color: #333300; 
       }
-			#header { border-bottom: 1px solid #999900; }
-			#container { padding-top: 10pt; }
+      #header p { margin: 2pt; }
+			#container { padding-top: 5pt; }
       #output { margin-top: 10pt; border: 1px solid #cccccc; padding: 2pt 5pt; }
-			#controls { padding: 2pt 5pt; background-color: #ccccff; }
+      #output div { margin: 0px; }
+      .word:hover { background-color: #cfc; }
+			#controls { padding: 2pt 5pt; background-color: #ddf; }
 			#controls span { padding-right: 5pt; }
 			.title { font-size: 150%; }
-			.button { background-color: #9f9; border: solid 1px #666; }
-			.button:hover { background-color: #dfd; }
+			.button { background-color: #fcc; border: solid 1px #666; }
+			.button:hover { background-color: #9f9; }
 			.description { font-size: 80%; color: #ccc; }
 			@media screen {
-				body { max-width: 450px;  }
+				body { max-width: 450px; }
 			}
 			@media handheld {
 				body { -webkit-text-size-adjust:none; padding: 5px; }
@@ -198,6 +205,10 @@
     </style>
        
 		<meta name="viewport" content="width=device-width" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<link rel="apple-touch-icon" sizes="57x57" href="http://alphajuliet.com/images/maitre-57x57.png" />
+		<link rel="apple-touch-icon" sizes="72x72" href="http://alphajuliet.com/images/maitre-72x72.png" />
+		<link rel="apple-touch-icon" sizes="114x114" href="http://alphajuliet.com/images/maitre-114x114.png" />
 	</head> 
 	<body> 
 		<div id="header"> 
