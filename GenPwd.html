@@ -210,7 +210,7 @@
         -->
     </style>
        
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width,user-scalable=no" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<link rel="icon" href="http://alphajuliet.com/images/favicon.ico"/>
 		<link rel="apple-touch-icon" sizes="57x57" href="http://alphajuliet.com/images/maitre-57x57.png" />
@@ -221,13 +221,13 @@
 		<div id="header"></div> 
 		<div id="container"> 
 			<div id="controls"> 
-				<div><input type="checkbox" id="punctuation" value="true"/> Punctuation</div> 
-				<div><input type="checkbox" id="numbers" value="true"/> Numbers </div>
-				<div><input type="checkbox" id="capitals" value="true"/> Capitals </div>
+				<div><input type="checkbox" id="punctuation" checked="true"/> Punctuation</div> 
+				<div><input type="checkbox" id="numbers" checked="true"/> Numbers </div>
+				<div><input type="checkbox" id="capitals" checked="true"/> Capitals </div>
 				<div>
 					<select id="gen">
-						<option value="generator1" selected="true">generator1</option>
-						<option value="generator2">generator2</option>
+						<option value="generator1">generator1</option>
+						<option value="generator2" selected="true">generator2</option>
 					</select>
 				</div>
 				<div><input class="button" type="button" value="Go!" onclick="GenPwd.generate();"/></div> 
