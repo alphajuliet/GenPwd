@@ -114,8 +114,9 @@
 				
 				// Pseudo-Japanese style
 				generator2: {
-					c1: WeightedList({"k":5,"g":5,"t":5,"d":5,"s":5,"z":4,"h":2,"b":2,"p":1,"n":3,"r":5,"m":3,"y":2,"gy":1,"j":1,"sh":1,"ch":1,"ky":1,"hy":1,"ry":1,"my":1,"ny":1,"by":1,"py":1}),
-					v1: WeightedList({"a":2,"i":1,"u":2,"e":1,"o":2}),
+					c1: WeightedList({"k":5,"g":5,"t":5,"d":5,"s":5,"z":4,"h":2,"b":3,"p":2,"n":3,"r":5,"m":5,"y":2,
+            "gy":1,"j":1,"sh":1,"ch":1,"ky":1,"hy":1,"ry":1,"my":1,"ny":1,"by":1,"py":1}),
+					v1: WeightedList({"a":2,"i":1,"u":2,"e":1,"o":2, "ou":1}),
 					p:  RandomList(["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"]),
 					cap: function (s) { return ($("#capitals").attr("checked")) ? s.capitalise() : s; },
 					punc: function () { return (GenPwd.getState("#punctuation")) ? this.p() : ""; },
