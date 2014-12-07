@@ -3,7 +3,7 @@ require 'SyncFTP'
 
 desc "Sync app to FTP site"
 task :upload do
-	ftp = SyncFTP.new('ftp.alphajuliet.com', :username => 'andrewj', :password => '/fPaA8l#')
+	ftp = SyncFTP.new('ftp.alphajuliet.com', :username => 'andrewj', :password => '')
 	ftp.sync(:local => 'build', :remote => '/public_html/lab')
 end
 
