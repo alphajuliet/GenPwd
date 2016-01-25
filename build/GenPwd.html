@@ -2,14 +2,14 @@
 <html> 
 	<head> 
 		<title>GenPwd</title> 
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 		<script type="text/javascript">
 		<!--
 		Info = {
 				name: "GenPwd",
 				author: "AndrewJ", 
-				version: "2.13",
-				date: "2013-04-01",
+				version: "2.14",
+				date: "2016-01-25",
 				info: "GenPwd is a very simple password generator.",
 				appendTo: function(tagName) {
 					var str = "<div>";
@@ -88,9 +88,9 @@
 					v2: WeightedList({"a":5, "e":5, "i":5, "ia":1, "o":5, "oa":1, "oo":2, "u":2, "ua":1}),
 					v3: WeightedList({"a":5,"ao":1,"e":5,"ea":1,"ee":2,"eo":1,"i":2,"ia":2, "io":2,"o":5, "oa":2, "oo":2,"ow":2,"ua":1, "uo":1,"y":5}),
 					p:  RandomList(["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"]),
-					cap: function (s) { return ($("#capitals").attr("checked")) ? s.capitalise() : s; },
-					punc: function () { return (GenPwd.getState("#punctuation")) ? this.p() : ""; },
-					num: function () { return (GenPwd.getState("#numbers")) ? pad2(Math.randomN(99)) : ""; },
+          cap: function (s) { return ($("#capitals:checked").length > 0 ? s.capitalise() : s); },
+          punc: function () { return ($("#punctuation:checked").length > 0 ? this.p() : ""); },
+          num: function () { return ($("#numbers:checked").length > 0 ? pad2(Math.randomN(99)) : ""); },
 					randomWord: function () {
 						var R = this;
 						var w = "";
@@ -118,19 +118,19 @@
             "gy":1,"j":1,"sh":1,"ch":1,"ky":1,"hy":1,"ry":1,"my":1,"ny":1,"by":1,"py":1}),
 					v1: WeightedList({"a":2,"i":1,"u":2,"e":1,"o":2, "ou":1}),
 					p:  RandomList(["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"]),
-					cap: function (s) { return ($("#capitals").attr("checked")) ? s.capitalise() : s; },
-					punc: function () { return (GenPwd.getState("#punctuation")) ? this.p() : ""; },
-					num: function () { return (GenPwd.getState("#numbers")) ? pad2(Math.randomN(99)) : ""; },
+          cap: function (s) { return ($("#capitals:checked").length > 0 ? s.capitalise() : s); },
+          punc: function () { return ($("#punctuation:checked").length > 0 ? this.p() : ""); },
+          num: function () { return ($("#numbers:checked").length > 0 ? pad2(Math.randomN(99)) : ""); },
 					randomWord: function () {
 						var R = this;
 						var w;
-						c = Math.randomN(4);
+						c = Math.randomN(5);
 						switch (c) {
 							case 0: w = R.c1() + R.v1() + R.punc() + R.cap(R.c1()) + R.v1() + R.c1() + R.v1(); break;
 							case 1: w = R.c1() + R.v1() + "n" + R.punc() + R.cap(R.c1()) + R.v1() + R.c1() + R.v1(); break;
 							case 2: w = R.c1() + R.v1() + R.punc() + R.c1() + R.v1() + R.cap(R.c1()) + R.v1() + "n"; break;
 							case 3: w = R.c1() + R.v1() + R.punc() + R.cap(R.c1()) + R.v1(); break;
-							default: w = R.cap(R.c1()) + R.v1() + "n";
+							default: w = R.c1() + R.v1() + R.cap(R.c1()) + R.v1() + "n";
 						}
 						w = (Math.randomN(2) < 1) ? w + R.num() : R.num() + w;
 						w = w.replace(/[Tt]i/, "chi");
@@ -191,22 +191,30 @@
       #output { margin-top: 5pt; }
       #output .word { font-size: 125%; margin: 3pt 0pt; padding-left: 5pt; }
       #output .word:nth-child(even) { background-color: #eef; } 
-			#controls { background-color: #ddf; }
+      #controls { 
+        background-color: #ddf; 
+        border-radius: 5px;
+        padding: 2pt;
+      }
 			#controls div { display: inline; margin: 4pt 4pt; }
 			.button { 
 				padding: 4pt 6pt;
 				margin: 6pt 4pt;
-				background-color: #fcc; 
+				background-color: #6ff; 
 				border: solid 1px #666; 
+        border-radius: 5px;
 			}
-			.button:hover { background-color: #9f9; }
+			.button:hover { background-color: #f9f; }
 			.description { font-size: 80%; font-weight: normal; color: #ccc; }
 			@media screen {
-				body { max-width: 450px; }
+        body { 
+          font-family: Helvetica;
+          max-width: 450px; 
+        }
 			}
 			@media handheld {
 				body { -webkit-text-size-adjust:none; padding: 5px; }
-				div { width: 100%!important; margin: 0!important; }
+				div { width: 100%!important; margin: 0pt !important; }
 			}
         -->
     </style>
@@ -222,9 +230,9 @@
 		<div id="header"></div> 
 		<div id="container"> 
 			<div id="controls"> 
-				<div><input type="checkbox" id="punctuation" checked="true"/> Punctuation</div> 
-				<div><input type="checkbox" id="numbers" checked="true"/> Numbers </div>
-				<div><input type="checkbox" id="capitals" checked="true"/> Capitals </div>
+				<div><input type="checkbox" id="punctuation" checked /> Punctuation</div> 
+				<div><input type="checkbox" id="numbers" checked /> Numbers </div>
+				<div><input type="checkbox" id="capitals" checked /> Capitals </div>
 				<div>
 					<select id="gen">
 						<option value="generator1">generator1</option>
