@@ -1,0 +1,42 @@
+body { 
+  font-family: Helvetica Neue, Geneva, Arial, sans-serif; 
+  font-weight: lighter;
+  font-size: 10pt;
+  margin: 3% 5%;
+  width: 90%;
+}
+
+#header p { margin: 2pt; }
+#header .title { font-size: 20pt; color: #639; }
+footer { 
+  font-size: 8pt;
+}
+#container { padding-top: 5pt; }
+#output { margin-top: 5pt; }
+#output .word { font-size: 125%; margin: 3pt 0pt; padding-left: 5pt; }
+#output .word:nth-child(even) { background-color: #eef; } 
+#controls { 
+  background-color: #ddf; 
+  border-radius: 5px;
+  padding: 2pt;
+}
+#controls div { display: inline; margin: 4pt 4pt; }
+.button { 
+  padding: 4pt 6pt;
+  margin: 6pt 4pt;
+  background-color: #6ff; 
+  border: solid 1px #666; 
+  border-radius: 5px;
+}
+.button:hover { background-color: #f9f; }
+.description { font-size: 80%; font-weight: normal; color: #ccc; }
+@media screen {
+  body { 
+    font-family: Helvetica;
+    max-width: 450px; 
+  }
+}
+@media handheld {
+  body { -webkit-text-size-adjust:none; padding: 5px; }
+  div { width: 100%!important; margin: 0pt !important; }
+}
