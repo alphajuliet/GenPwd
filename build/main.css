@@ -6,8 +6,8 @@ body {
   width: 90%;
 }
 
-#header p { margin: 2pt; }
-#header .title { font-size: 20pt; color: #639; }
+header p { margin: 2pt; }
+header .title { font-size: 20pt; color: #639; }
 footer { 
   font-size: 8pt;
 }
