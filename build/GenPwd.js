@@ -2,7 +2,7 @@
 
 // Extend array to return a random element 
 Array.prototype.randomElement = function () {
-  return _.nth(this, _.random(0, this.length - 1));
+  return this[_.random(0, this.length - 1)]
 }
 
 //---------------------------------
@@ -35,12 +35,6 @@ GenPwd = (function () {
   };
   var nwords = 10;
 
-  // Utility function		
-  var doTimes = function (n, fn) {
-    for (var i=0; i<n; i++) fn();
-    return n;
-  }
-
   // Random number string
   var randomNumericString = function () {
     return _.padStart(_.random(0, 99), 2, "0")
@@ -55,10 +49,9 @@ GenPwd = (function () {
 
   var WeightedList = function (t) {
     var expandedList = [];
-    _.forEach(t, function (value, key) {
-      doTimes(value, function () {
+    $.each(t, function (key, value) {
+      for (i=0; i<value; i++) 
         expandedList.push(key);
-      });
     });
     return function () {
       return expandedList.randomElement();
@@ -72,6 +65,7 @@ GenPwd = (function () {
   // Public
   return {
     nwords: nwords,
+    randomNumericString: randomNumericString,
     RandomList: RandomList,
     WeightedList: WeightedList,
     initialise: initialise
@@ -98,7 +92,7 @@ Generator = (function () {
     p:  GenPwd.RandomList(["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"]),
     cap: function (s) { return ($("#capitals:checked").length > 0 ? _.capitalize(s) : s); },
     punc: function () { return ($("#punctuation:checked").length > 0 ? this.p() : ""); },
-    num: function () { return ($("#numbers:checked").length > 0 ? _.padStart(_.random(0, 99), 2, "0") : ""); },
+    num: function () { return ($("#numbers:checked").length > 0 ? GenPwd.randomNumericString() : ""); },
     randomWord: function () {
       var R = this;
       var w = "";
@@ -129,20 +123,26 @@ Generator = (function () {
     p:  GenPwd.RandomList(["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"]),
     cap: function (s) { return ($("#capitals:checked").length > 0 ? _.capitalize(s) : s); },
     punc: function () { return ($("#punctuation:checked").length > 0 ? this.p() : ""); },
-    num: function () { return ($("#numbers:checked").length > 0 ? _.padStart(_.random(0, 99), 2, "0") : ""); },
+    num: function () { return ($("#numbers:checked").length > 0 ? GenPwd.randomNumericString() : ""); },
 
     randomWord: function () {
       var R = this;
       var w;
-      c = _.random(0, 5);
+
+      var syll = function () {
+        var x = R.c1() + R.v1();
+        if (_.random(0,4) == 0) x = x + "n";
+        return x
+      };
+
+      c = _.random(0, 2);
       switch (c) {
-        case 0: w = R.c1() + R.v1() + R.punc() + R.cap(R.c1()) + R.v1() + R.c1() + R.v1(); break;
-        case 1: w = R.c1() + R.v1() + "n" + R.punc() + R.cap(R.c1()) + R.v1() + R.c1() + R.v1(); break;
-        case 2: w = R.c1() + R.v1() + R.punc() + R.c1() + R.v1() + R.cap(R.c1()) + R.v1() + "n"; break;
-        case 3: w = R.c1() + R.v1() + R.punc() + R.cap(R.c1()) + R.v1(); break;
-        default: w = R.c1() + R.v1() + R.cap(R.c1()) + R.v1() + "n";
+        case 0: w = syll() + R.punc() + R.cap(syll()); break;
+        case 1: w = syll() + R.punc() + R.cap(syll()) + syll(); break;
+        case 2: w = R.v1() + R.cap(syll()) + R.punc() + syll() ; break;
+        default: w = R.punc() + syll() + R.cap(syll());
       }
-      w = (_.random(0, 2) < 1) ? w + R.num() : R.num() + w;
+      w = (_.random(0, 2) < 1) ? w + R.num() : R.num() + w; // add a number at start or end
       w = w.replace(/[Tt]i/, "chi");
       w = w.replace(/[Ss]i/, "shi");
       w = w.replace(/[Hh]u/, "fu");
