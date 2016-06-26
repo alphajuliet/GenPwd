@@ -3,10 +3,11 @@ __GenPwd__ is a simple password generator that runs in a single-page HTML applic
 There are two generators available:
 * _generator1_: vaguely reminiscent of English
 * _generator2_: something resembling Japanese
+* _generator3_: another Englishy variant
 
 # Caveats
 
-1. The generated passwords are not guaranteed or even designed to be uniformly distributed throughout the target space. They should not be used for systems that require strong password authentication. Use at your own risk.
+1. The generated passwords are not guaranteed or even designed to be uniformly distributed throughout the target space. They should not be used for systems that require strong password authentication. Use at your own risk, or use two-factor authentication.
 
 2. Randomly generated words may turn out to be offensive in some languages. If you're offended by something in the list, sorry, try again.
 
@@ -15,13 +16,15 @@ There are two generators available:
 ## Backlog
 
 * Use pluggable generators
+* Do something based on phonotactics
 
 ## In Progress
 
-* Clean up code
 
 ## Done
 
+* Add a third generator
+* Clean and improve code
 * Use Lodash to standardise function calls.
 * Update to jQuery 3.0.0
 * Refactored code to allow additional generators

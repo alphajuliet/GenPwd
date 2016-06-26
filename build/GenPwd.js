@@ -36,8 +36,8 @@ GenPwd = (function () {
   var nwords = 10;
 
   // Random number string
-  var randomNumericString = function () {
-    return _.padStart(_.random(0, 99), 2, "0")
+  var randomNumericString = function (n) {
+    return _.padStart(_.random(0, Math.pow(10,n)-1), n, "0")
   }
 
   // List generators returning functions to call
@@ -98,7 +98,14 @@ GenPwd = (function () {
 var Generator = Generator || {};
 Generator = (function () {
 
-  // Generators
+  var p =  GenPwd.RandomList(["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"]);
+  var cap = function (s) { return ($("#capitals:checked").length > 0 ? _.capitalize(s) : s); };
+  var punc = function () { return ($("#punctuation:checked").length > 0 ? p() : ""); };
+  var num = function (n) { return ($("#numbers:checked").length > 0 ? GenPwd.randomNumericString(n) : ""); };
+
+  //---------------------------------
+  // Generator 1
+
   var generator1 = (function () {	
     var c1 = GenPwd.WeightedList(
       {"b":2,"bl":1,"br":1,"c":2,"cr":1,"ch":2,"cl":1,"d":2,"f":2,"fl":1,
@@ -122,11 +129,7 @@ Generator = (function () {
     var v3 = GenPwd.WeightedList(
       {"a":5,"ao":1,"e":5,"ea":1,"ee":2,"eo":1,"i":2,"ia":2,"io":2,"o":5,
         "oa":2,"oo":2,"ow":2,"ua":1,"uo":1,"y":5});
-    var p =  GenPwd.RandomList(
-      ["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"]);
-    var cap = function (s) { return ($("#capitals:checked").length > 0 ? _.capitalize(s) : s); };
-    var punc = function () { return ($("#punctuation:checked").length > 0 ? p() : ""); };
-    var num = function () { return ($("#numbers:checked").length > 0 ? GenPwd.randomNumericString() : ""); };
+
     var randomWord = function () {
       var syll1 = function () { return c1() + v1() + c2(); };
       var w = "";
@@ -146,10 +149,14 @@ Generator = (function () {
       // return c + ": " + w;
       return w;
     };
+
+    // Public data
     return {randomWord: randomWord }
   })();
 
+  //---------------------------------
   // Pseudo-Japanese style
+
   var generator2 = (function () {
     var c1 = GenPwd.WeightedList(
       {"k":5,"g":5,"t":5,"d":5,"s":5,"z":4,"h":3,"b":3,
@@ -157,12 +164,6 @@ Generator = (function () {
         "ch":2,"ky":1,"hy":1,"ry":2,"my":1,"ny":1,"by":1,"py":1});
     var v1 = GenPwd.WeightedList(
       {"a":2,"i":1,"u":2,"e":1,"o":2, "ou":1});
-    var p =  GenPwd.RandomList(
-      ["!","#","$","^","*","&", "+","@","-","=","/","~","?",
-        "\\","%","[","]","{","}","(",")"]);
-    var cap = function (s) { return ($("#capitals:checked").length > 0 ? _.capitalize(s) : s); };
-    var punc = function () { return ($("#punctuation:checked").length > 0 ? p() : ""); };
-    var num = function () { return ($("#numbers:checked").length > 0 ? GenPwd.randomNumericString() : ""); };
 
     var randomWord = function () {
       var w;
@@ -181,7 +182,7 @@ Generator = (function () {
         case 3: w = syll() + v1() + cap(syll()) + punc(); break;
         default: w = syll() + cap(syll()) + punc();
       }
-      w = (_.random(0, 2) < 1) ? w + num() : num() + w; // add a number at start or end
+      w = (_.random(0, 2) < 1) ? w + num(2) : num(2) + w; // add a number at start or end
       w = w.replace(/[Tt]i/, "chi");
       w = w.replace(/[Ss]i/, "shi");
       w = w.replace(/[Hh]u/, "fu");
@@ -193,17 +194,67 @@ Generator = (function () {
       return w;
     };
 
+    // Public data
+    return {randomWord: randomWord};
+  })();
+
+  //---------------------------------
+  // Another attempt at Englishy words
+
+  var generator3 = (function () {
+
+    // Consonants
+    var c = GenPwd.WeightedList(
+      {"k":5,"g":5,"t":5,"d":5,"s":5,"z":2,"b":4,
+        "p":3,"n":4,"r":5,"m":4,"j":1,"sh":2,"l":2,"ch":2});
+    var ce = GenPwd.WeightedList(
+      {"ck":1,"g":3,"t":3,"d":3,"ss":2,"bb":1,
+        "pp":1,"rp":1,"n":4,"th":1,"m":2,"sh":2,"ll":2,"ch":2,
+        "st":1,"nt":1,"ft":1,"mt":1,"rm":1,"rn":1,"rs":1,"rt":1,
+        "ng":1,"nch":1,"nd":1,"rd":1,"sk":1,"nce":1,"rce":1});
+    var cs = GenPwd.WeightedList(
+      {"k":5,"g":5,"t":5,"d":5,"s":5,"z":2,"b":4,
+        "p":3,"n":4,"r":5,"m":4,"j":2,"sh":2,"l":2,"ch":2,
+        "bl":1,"br":1,"dr":1,"fl":1,"fr":1,"gl":1,"gr":1,
+        "cl":1,"cr":1,"sl":1,"st":1,"str":1,"w":1});
+
+    // Vowels
+    var vm = GenPwd.WeightedList(
+      {"a":3,"ai":1,"e":3,"ee":2,"io":1,"oo":2,"i":3,"o":3,"u":2});
+    var ve = GenPwd.WeightedList(
+      {"a":2,"ee":1,"i":2,"io":1,"o":2,"oo":1,"y":2});
+    var vs = GenPwd.WeightedList(
+      {"a":1,"e":1,"i":1,"o":1});
+
+
+    var randomWord = function () {
+      var w;
+      switch (_.random(0, 5)) {
+        case 0: w = c() + vm() + cap(c()) + vm() + ce(); break;
+        case 1: w = cap(c()) + vm() + c() + ve(); break;
+        case 2: w = cs() + vm() + cap(ce()); break;
+        case 3: w = cap(cs()) + vm() + c(); break;
+        case 4: w = vs() + c() + cap(c()) + ve(); break;
+        case 5: w = vs() + c() + cap(c()) + vm() + ce(); break;
+      }
+      w = w + punc() + num(3);
+      return w;
+    }
+
+    // Public data
     return {randomWord: randomWord};
   })();
 
   // Public
   return {
     generators: [
-      {"name": "English 1", "fn": "generator1"}, 
-      {"name": "Japanese", "fn": "generator2", "default": true}
+      {"name": "Gen 1", "fn": "generator1"}, 
+      {"name": "Gen 2", "fn": "generator2", "default": true},
+      {"name": "Gen 3", "fn": "generator3"}
     ],
     generator1: generator1,
     generator2: generator2,
+    generator3: generator3,
   }
 
 })();	
