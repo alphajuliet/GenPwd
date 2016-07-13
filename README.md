@@ -1,9 +1,10 @@
 __GenPwd__ is a simple password generator that runs in a single-page HTML application. Using combinations of weighted letters and vowels it generates pseudo-random words. It offers options for additional complexity through incorporating numbers, punctuation, and capitals.
 
-There are two generators available:
+These are the available generators:
 * _generator1_: vaguely reminiscent of English
 * _generator2_: something resembling Japanese
 * _generator3_: another Englishy variant
+* _generator4_: a simple 1-character lookahead Markov chain, trainied on some English text. See the R project for the code.
 
 # Caveats
 
@@ -20,10 +21,9 @@ There are two generators available:
 
 ## In Progress
 
-* Use a Markov chain as a generator
-
 ## Done
 
+* Use a Markov chain as a generator
 * Add a third generator
 * Clean and improve code
 * Use Lodash to standardise function calls.
