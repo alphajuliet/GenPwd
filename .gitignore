@@ -3,3 +3,4 @@
 .Rproj.user
 markov/*.txt
 markov/*.Rproj
+markov/.*
