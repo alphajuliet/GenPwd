@@ -1,0 +1,75 @@
+---
+title: "create-matrix"
+author: "AndrewJ"
+date: "13 July 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Description
+
+Generate a Markov chain transition probability matrix from given text, to be used as input to a password generator in Javascript.
+
+# Setup
+
+```{r echo = FALSE, results = FALSE}
+library(dplyr)
+library(tibble)
+library(tidyr)
+library(ggplot2)
+library(tm)
+library(markovchain)
+```
+
+# Read in all sample text
+
+```{r}
+txt <- VCorpus(DirSource(pattern = "sample-[0-9]+.txt")) %>%
+  tm_map(removePunctuation) %>%
+  tm_map(content_transformer(tolower)) %>%
+  tm_map(removeWords, stopwords("english")) 
+
+words <- as.character(txt[[1]]) %>% 
+  paste(collapse = "") %>%
+  gsub("  ", " ", x = .) %>%
+  strsplit(split = '') %>%
+  unlist
+```
+
+# Generate transition matrix
+
+```{r}
+chain <- markovchainFit(words, method = "mle")
+transitions <- chain$estimate@transitionMatrix
+```
+
+# Visualise
+
+First, turn from wide to "tidy" format
+```{r}
+trans_tbl <- as_tibble(transitions) %>%
+  mutate(Source = row.names(transitions)) %>%
+  gather(key = Target, value = Probability, ` `:z)
+```
+
+Heat map
+```{r}
+trans_tbl %>%
+  ggplot(aes(x = Source, y = Target)) +
+  geom_raster(aes(fill = Probability))
+```
+
+Dendrogram
+```{r}
+transitions %>% scale %>% dist %>% hclust %>% plot
+```
+
+# Export
+
+```{r}
+write(t(transitions), file = "transitions.txt", ncolumns = 26, sep = ",")
+```
+

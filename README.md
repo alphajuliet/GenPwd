@@ -20,6 +20,7 @@ There are two generators available:
 
 ## In Progress
 
+* Use a Markov chain as a generator
 
 ## Done
 
@@ -33,4 +34,3 @@ There are two generators available:
 * Added pseudo-Japanese generator
 * Added .gitignore
 * Updated jQuery to 1.8.3
-
