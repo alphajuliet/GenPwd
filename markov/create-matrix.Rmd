@@ -62,14 +62,11 @@ trans_tbl %>%
   geom_raster(aes(fill = Probability))
 ```
 
-Dendrogram
-```{r}
-transitions %>% scale %>% dist %>% hclust %>% plot
-```
-
 # Export
 
 ```{r}
-write(t(transitions), file = "transitions.txt", ncolumns = 26, sep = ",")
+transitions %>%
+  t %>%
+  write(file = "transitions.txt", ncolumns = nrow(.), sep = ",")
 ```
 
