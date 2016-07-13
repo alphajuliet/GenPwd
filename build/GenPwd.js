@@ -1,6 +1,6 @@
 // GenPwd.js
 
-// Extend array to return a random element 
+// Extend array to return a random element
 Array.prototype.randomElement = function () {
   return this[_.random(0, this.length - 1)]
 }
@@ -14,9 +14,9 @@ GenPwd = (function () {
   // Application metadata
   var Info = {
     name: "GenPwd",
-    author: "AndrewJ", 
-    version: "2.16",
-    date: "2016-06-25",
+    author: "AndrewJ",
+    version: "2.17",
+    date: "2016-07-13",
     info: "GenPwd is a very simple password generator.",
     appendTo: function(tagName) {
       var str = "<div>";
@@ -50,7 +50,7 @@ GenPwd = (function () {
   var WeightedList = function (t) {
     var expandedList = [];
     $.each(t, function (key, value) {
-      for (i=0; i<value; i++) 
+      for (i=0; i<value; i++)
         expandedList.push(key);
     });
     return function () {
@@ -62,7 +62,7 @@ GenPwd = (function () {
     var fn;
     Info.appendTo("header");
     $.each(Generator.generators, function (i, gen) {
-      if (gen.default == true) 
+      if (gen.default == true)
         fn = gen.fn + '" selected="true';
       else
         fn = gen.fn
@@ -106,7 +106,7 @@ Generator = (function () {
   //---------------------------------
   // Generator 1
 
-  var generator1 = (function () {	
+  var generator1 = (function () {
     var c1 = GenPwd.WeightedList(
       {"b":2,"bl":1,"br":1,"c":2,"cr":1,"ch":2,"cl":1,"d":2,"f":2,"fl":1,
         "fr":1,"g":2,"gl":1,"gr":1,"h":1,"j":2,"k":2,"l":2,"m":3,"n":2,"p":2,
@@ -210,17 +210,18 @@ Generator = (function () {
     var ce = GenPwd.WeightedList(
       {"ck":1,"g":3,"t":3,"d":3,"ss":2,"bb":1,
         "pp":1,"rp":1,"n":4,"th":1,"m":2,"sh":2,"ll":2,"ch":2,
-        "st":1,"nt":1,"ft":1,"mt":1,"rm":1,"rn":1,"rs":1,"rt":1,
-        "ng":1,"nch":1,"nd":1,"rd":1,"sk":1,"nce":1,"rce":1});
+        "st":2,"nt":2,"ft":1,"mt":1,"rk":2,"rm":1,"rn":1,"rs":1,"rt":2,
+        "ng":2,"nch":1,"nd":1,"rd":1,"sk":1,"nce":1,"rce":1});
     var cs = GenPwd.WeightedList(
       {"k":5,"g":5,"t":5,"d":5,"s":5,"z":2,"b":4,
         "p":3,"n":4,"r":5,"m":4,"j":2,"sh":2,"l":2,"ch":2,
         "bl":1,"br":1,"dr":1,"fl":1,"fr":1,"gl":1,"gr":1,
-        "cl":1,"cr":1,"sl":1,"st":1,"str":1,"w":1});
+        "cl":1,"cr":1,"sl":1,"st":1,"str":1,"thr":1,"tr":2,"tw":1,
+        "w":1});
 
     // Vowels
     var vm = GenPwd.WeightedList(
-      {"a":3,"ai":1,"e":3,"ee":2,"io":1,"oo":2,"i":3,"o":3,"u":2});
+      {"a":4,"ai":1,"e":4,"ee":2,"io":1,"oo":2,"i":4,"o":4,"u":2});
     var ve = GenPwd.WeightedList(
       {"a":2,"ee":1,"i":2,"io":1,"o":2,"oo":1,"y":2});
     var vs = GenPwd.WeightedList(
@@ -229,13 +230,14 @@ Generator = (function () {
 
     var randomWord = function () {
       var w;
-      switch (_.random(0, 5)) {
+      switch (_.random(0, 6)) {
         case 0: w = c() + vm() + cap(c()) + vm() + ce(); break;
         case 1: w = cap(c()) + vm() + c() + ve(); break;
-        case 2: w = cs() + vm() + cap(ce()); break;
+        case 2: w = cs() + vm() + cap(c()) + vm() + c() + ve(); break;
         case 3: w = cap(cs()) + vm() + c(); break;
         case 4: w = vs() + c() + cap(c()) + ve(); break;
         case 5: w = vs() + c() + cap(c()) + vm() + ce(); break;
+        case 6: w = cap(c()) + vm() + c() + vm() + c() + vm() + ce(); break;
       }
       w = w + punc() + num(3);
       return w;
@@ -248,7 +250,7 @@ Generator = (function () {
   // Public
   return {
     generators: [
-      {"name": "Gen 1", "fn": "generator1"}, 
+      {"name": "Gen 1", "fn": "generator1"},
       {"name": "Gen 2", "fn": "generator2", "default": true},
       {"name": "Gen 3", "fn": "generator3"}
     ],
@@ -257,6 +259,6 @@ Generator = (function () {
     generator3: generator3,
   }
 
-})();	
+})();
 
 // The End
