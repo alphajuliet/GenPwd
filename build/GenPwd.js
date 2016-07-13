@@ -15,7 +15,7 @@ GenPwd = (function () {
   var Info = {
     name: "GenPwd",
     author: "AndrewJ",
-    version: "2.17",
+    version: "2.18",
     date: "2016-07-13",
     info: "GenPwd is a very simple password generator.",
     appendTo: function(tagName) {
@@ -288,6 +288,10 @@ Generator = (function () {
       var row = tr_matrix[row_idx]
       var x = GenPwd.WeightedList(_.zipObject(symbols, row))
       return x();
+    }
+
+    var randomCap = function (w) {
+
     }
 
     // Generate a random word of a minimum and maximum length
