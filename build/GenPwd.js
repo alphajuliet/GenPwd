@@ -15,8 +15,8 @@ GenPwd = (function () {
   var Info = {
     name: "GenPwd",
     author: "AndrewJ",
-    version: "2.18",
-    date: "2016-07-13",
+    version: "2.19",
+    date: "2016-07-23",
     info: "GenPwd is a very simple password generator.",
     appendTo: function(tagName) {
       var str = "<div>";
@@ -145,7 +145,7 @@ Generator = (function () {
         case 7:  w = c1() + v1() + cap(c1()) + v1() + c1() + v1() + punc(); break
         default: w = c1() + v1() + punc() + cap(c3()) + v3(); break;
       }
-      w = (_.random(0, 2) < 1) ? w + num() : num() + w;
+      w = (_.random(0, 2) < 1) ? w + num(2) : num(2) + w;
       // return c + ": " + w;
       return w;
     };
