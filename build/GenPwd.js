@@ -12,7 +12,7 @@ GenPwd = (function () {
     author: "AndrewJ",
     version: "2.21",
     date: "2016-09-03",
-    info: "GenPwd is a very simple password generator.",
+    info: "GenPwd is a simple password generator.",
     appendTo: function(tagName) {
       var str = "<div>";
       str += "<span class='title'>" + this.name + "</span>";
@@ -29,6 +29,7 @@ GenPwd = (function () {
     }
   };
 
+  // Display the app info, and populate the list of available generators.
   var initialise = function () {
     var fn;
     Info.appendTo("header");
@@ -41,6 +42,7 @@ GenPwd = (function () {
     });
   };
 
+  // Main function to generate a list of random words, based on the chosen generator.
   var generate = function (output) {
     var nwords = 10;
     var gen_opt = $('#gen').val();
@@ -54,7 +56,7 @@ GenPwd = (function () {
     });
   };
 
-  // Public
+  // Public data
   return {
     initialise: initialise,
     generate: generate
@@ -177,9 +179,7 @@ Generator = (function () {
 
   //---------------------------------
   // Generator 1
-
-  // A more functional version would look like this...
-  // case 0: w = R.pipe(syll1, punc, cap(c2), c2, c3)
+  // The original generator
 
   var generator1 = (function () {
     var c1 = WeightedList(
@@ -230,6 +230,7 @@ Generator = (function () {
   })();
 
   //---------------------------------
+  // Generator 2
   // Pseudo-Japanese style
 
   var generator2 = (function () {
@@ -274,6 +275,7 @@ Generator = (function () {
   })();
 
   //---------------------------------
+  // Generator 3
   // Another attempt at Englishy words
 
   var generator3 = (function () {
@@ -322,7 +324,10 @@ Generator = (function () {
     return {randomWord: randomWord};
   })();
 
+  //---------------------------------
+  // Generator 4
   // Markov chain generator
+
   var generator4 = (function () {
 
     // Generated Markov transition matrix for the given set.
@@ -399,10 +404,10 @@ Generator = (function () {
 
   })();
 
-  // Public
+  // Public data
   return {
     generators: [
-      {"name": "Gen 0", "fn": "generator0"},
+      // {"name": "Gen 0", "fn": "generator0"},
       {"name": "Gen 1", "fn": "generator1"},
       {"name": "Gen 2", "fn": "generator2"},
       {"name": "Gen 3", "fn": "generator3"},
