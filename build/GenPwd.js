@@ -1,10 +1,5 @@
 // GenPwd.js
 
-// Extend array to return a random element
-Array.prototype.randomElement = function () {
-  return this[_.random(0, this.length - 1)];
-};
-
 //---------------------------------
 // Namespace: GenPwd
 
@@ -79,28 +74,31 @@ Generator = (function () {
     return _.padStart(_.random(0, Math.pow(10,n)-1), n, "0");
   };
 
-  // List generators returning functions to call
+  // Wraps a function that returns a random element from the given list.
   var RandomList = function (t) {
     return function () {
-      return t.randomElement();
+      // return t[_.random(0, t.length - 1)];
+      return t[Math.floor(Math.random() * t.length)];
     };
   };
 
-  // Creates multiple versions of an element based on the count.
-  // e.g. {"a":2, "b":3} -> ["a", "a", "b", "b", "b"]
+  // Return a function that randomly selects elements from a weighted list.
+  // A weighted list simply has more copies of higher weighted elements.
   var WeightedList = function (t) {
 
+    // Return an array of n copies of x.
     var repeat = function (x, n) {
       return R.times(function (i) {return (x);}, n);
     };
 
+    // Creates multiple versions of an element based on the count.
+    // e.g. {"a":2, "b":3} -> ["a", "a", "b", "b", "b"]
     var expandedList = R.chain(
       function (p) { return repeat(p[0], p[1]); },
-      R.toPairs(t));
+      R.toPairs(t)
+    );
 
-    return function () {
-      return expandedList.randomElement();
-    };
+    return RandomList(expandedList);
   };
 
   var p =  RandomList(["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"]);
@@ -297,7 +295,7 @@ Generator = (function () {
       var multiplier = 1 / R.reduce(R.min, Infinity, R.filter(function (x) { return (x > 0); }, row));
       var int_row = R.map(R.compose(round(1), R.multiply(multiplier)), row);
 
-      var x = WeightedList(_.zipObject(symbols, int_row));
+      var x = WeightedList(R.zipObj(symbols, int_row));
       return x();
     };
 
@@ -333,9 +331,9 @@ Generator = (function () {
   return {
     generators: [
       {"name": "Gen 1", "fn": "generator1"},
-      {"name": "Gen 2", "fn": "generator2", "default": true},
+      {"name": "Gen 2", "fn": "generator2"},
       {"name": "Gen 3", "fn": "generator3"},
-      {"name": "Markov", "fn": "generator4"}
+      {"name": "Markov", "fn": "generator4", "default": true}
     ],
     generator1: generator1,
     generator2: generator2,
