@@ -86,12 +86,18 @@ Generator = (function () {
     };
   };
 
+  // Creates multiple versions of an element based on the count.
+  // e.g. {"a":2, "b":3} -> ["a", "a", "b", "b", "b"]
   var WeightedList = function (t) {
-    var expandedList = [];
-    $.each(t, function (key, value) {
-      for (i=0; i<value; i++)
-        expandedList.push(key);
-    });
+
+    var repeat = function (x, n) {
+      return R.times(function (i) {return (x);}, n);
+    };
+
+    var expandedList = R.chain(
+      function (p) { return repeat(p[0], p[1]); },
+      R.toPairs(t));
+
     return function () {
       return expandedList.randomElement();
     };
@@ -285,7 +291,13 @@ Generator = (function () {
     var nextLetter = function (ltr, symbols, tr_matrix) {
       var row_idx = _.indexOf(symbols, ltr);
       var row = tr_matrix[row_idx];
-      var x = WeightedList(_.zipObject(symbols, row));
+
+      // Normalise the probabilities to integers for the weighted list.
+      var round = R.flip(R.curry(Math.round));
+      var multiplier = 1 / R.reduce(R.min, Infinity, R.filter(function (x) { return (x > 0); }, row));
+      var int_row = R.map(R.compose(round(1), R.multiply(multiplier)), row);
+
+      var x = WeightedList(_.zipObject(symbols, int_row));
       return x();
     };
 
