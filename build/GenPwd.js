@@ -15,7 +15,7 @@ GenPwd = (function () {
   var Info = {
     name: "GenPwd",
     author: "AndrewJ",
-    version: "2.20",
+    version: "2.21",
     date: "2016-09-03",
     info: "GenPwd is a very simple password generator.",
     appendTo: function(tagName) {
@@ -33,7 +33,46 @@ GenPwd = (function () {
       return str;
     }
   };
-  var nwords = 10;
+
+  var initialise = function () {
+    var fn;
+    Info.appendTo("header");
+    $.each(Generator.generators, function (i, gen) {
+      if (gen.default === true)
+        fn = gen.fn + '" selected="true';
+      else
+        fn = gen.fn;
+      $('#gen').append($('<option value="' + fn + '">' + gen.name + '</option>'));
+    });
+  };
+
+  var generate = function (output) {
+    var nwords = 10;
+    var gen_opt = $('#gen').val();
+    var gen = Generator[gen_opt];
+
+    $(output).empty();
+    _.range(0, nwords).forEach(function (i) {
+      $(output).append(
+        $("<div class='word'></div>").append(gen.randomWord())
+      );
+    });
+  };
+
+  // Public
+  return {
+    initialise: initialise,
+    generate: generate
+  };
+
+})();
+
+
+//---------------------------------
+// Namespace: Generator
+
+var Generator = Generator || {};
+Generator = (function () {
 
   // Random number string
   var randomNumericString = function (n) {
@@ -58,76 +97,35 @@ GenPwd = (function () {
     };
   };
 
-  var initialise = function () {
-    var fn;
-    Info.appendTo("header");
-    $.each(Generator.generators, function (i, gen) {
-      if (gen.default === true)
-        fn = gen.fn + '" selected="true';
-      else
-        fn = gen.fn;
-      $('#gen').append($('<option value="' + fn + '">' + gen.name + '</option>'));
-    });
-  };
-
-  var generate = function () {
-    var gen_opt = $('#gen').val();
-    var gen = Generator[gen_opt];
-    $("#output").empty();
-    for (var i=0; i < nwords; i++) {
-      elt = $("<div class='word'></div>").append(gen.randomWord());
-      $("#output").append(elt);
-    }
-  };
-
-  // Public
-  return {
-    nwords: nwords,
-    randomNumericString: randomNumericString,
-    RandomList: RandomList,
-    WeightedList: WeightedList,
-    initialise: initialise,
-    generate: generate
-  };
-
-})();
-
-
-//---------------------------------
-// Namespace: Generator
-
-var Generator = Generator || {};
-Generator = (function () {
-
-  var p =  GenPwd.RandomList(["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"]);
+  var p =  RandomList(["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"]);
   var cap = function (s) { return ($("#capitals:checked").length > 0 ? _.capitalize(s) : s); };
   var punc = function () { return ($("#punctuation:checked").length > 0 ? p() : ""); };
-  var num = function (n) { return ($("#numbers:checked").length > 0 ? GenPwd.randomNumericString(n) : ""); };
+  var num = function (n) { return ($("#numbers:checked").length > 0 ? randomNumericString(n) : ""); };
 
   //---------------------------------
   // Generator 1
 
   var generator1 = (function () {
-    var c1 = GenPwd.WeightedList(
+    var c1 = WeightedList(
       {"b":2,"bl":1,"br":1,"c":2,"cr":1,"ch":2,"cl":1,"d":2,"f":2,"fl":1,
         "fr":1,"g":2,"gl":1,"gr":1,"h":1,"j":2,"k":2,"l":2,"m":3,"n":2,"p":2,
         "pl":1,"pr":1,"qu":1,"r":2,"s":3,"sh":2,"sk":1,"sl":1,"sm":1,"sn":1,
         "st":2,"str":1,"t":3,"th":2,"thr":1,"tr":2,"tw":1,"v":2,"w":1,"z":2});
-    var c2 = GenPwd.RandomList(
+    var c2 = RandomList(
       ["b","bl","br","cr","ch","cl","d","f","fl","fr","g","gg", "gl","gr",
         "h","j","k","l","m","n","p","pl","pp","pr","pt","qu","r","s","sh","sk",
         "sl","sm","sn","st","str","t","th","thr","tr","tw","v","w","z"]);
-    var c3 = GenPwd.WeightedList(
+    var c3 = WeightedList(
       {"b":1,"ch":1,"ck":1,"ct":1,"d":2,"dd":1,"f":1,"ff":1,"ft":1,"g":1,
         "k":1,"l":2,"ll":1,"lb":1,"ld":1,"lm":1,"ln":1,"lp":1,"lt":1,"m":3,
         "mp":1,"mt":1,"n":3,"nd":1,"ng":1,"nn":1,"nt":1,"p":2,"pp":1,"pt":1,
         "rd":1,"rg":1,"rk":1,"rn":1,"rr":1,"rs":1,"rt":1,"s":3,"sh":1,"ss":2,
         "st":2,"t":3,"tt":2,"th":2,"v":2,"wn":1});
-    var v1 = GenPwd.WeightedList(
+    var v1 = WeightedList(
       {"a":5,"aa":1,"ai":1,"e":5,"ea":1,"ee":1,"i":5,"o":5,"oo":2,"u":2});
-    var v2 = GenPwd.WeightedList(
+    var v2 = WeightedList(
       {"a":5, "e":5,"i":5, "ia":1, "o":5, "oa":1,"oo":2, "u":2, "ua":1});
-    var v3 = GenPwd.WeightedList(
+    var v3 = WeightedList(
       {"a":5,"ao":1,"e":5,"ea":1,"ee":2,"eo":1,"i":2,"ia":2,"io":2,"o":5,
         "oa":2,"oo":2,"ow":2,"ua":1,"uo":1,"y":5});
 
@@ -159,11 +157,11 @@ Generator = (function () {
   // Pseudo-Japanese style
 
   var generator2 = (function () {
-    var c1 = GenPwd.WeightedList(
+    var c1 = WeightedList(
       {"k":5,"g":5,"t":5,"d":5,"s":5,"z":4,"h":3,"b":3,
         "p":3,"n":3,"r":5,"m":5,"y":2,"gy":1,"j":2,"sh":2,
         "ch":2,"ky":1,"hy":1,"ry":2,"my":1,"ny":1,"by":1,"py":1});
-    var v1 = GenPwd.WeightedList(
+    var v1 = WeightedList(
       {"a":2,"i":1,"u":2,"e":1,"o":2, "ou":1});
 
     var randomWord = function () {
@@ -205,15 +203,15 @@ Generator = (function () {
   var generator3 = (function () {
 
     // Consonants
-    var c = GenPwd.WeightedList(
+    var c = WeightedList(
       {"k":5,"g":5,"t":5,"d":5,"s":5,"z":2,"b":4,
         "p":3,"n":4,"r":5,"m":4,"j":1,"sh":2,"l":2,"ch":2});
-    var ce = GenPwd.WeightedList(
+    var ce = WeightedList(
       {"ck":1,"g":3,"t":3,"d":3,"ss":2,"bb":1,
         "pp":1,"rp":1,"n":4,"th":1,"m":2,"sh":2,"ll":2,"ch":2,
         "st":2,"nt":2,"ft":1,"mt":1,"rk":2,"rm":1,"rn":1,"rs":1,"rt":2,
         "ng":2,"nch":1,"nd":1,"rd":1,"sk":1,"nce":1,"rce":1});
-    var cs = GenPwd.WeightedList(
+    var cs = WeightedList(
       {"k":5,"g":5,"t":5,"d":5,"s":5,"z":2,"b":4,
         "p":3,"n":4,"r":5,"m":4,"j":2,"sh":2,"l":2,"ch":2,
         "bl":1,"br":1,"dr":1,"fl":1,"fr":1,"gl":1,"gr":1,
@@ -221,11 +219,11 @@ Generator = (function () {
         "w":1});
 
     // Vowels
-    var vm = GenPwd.WeightedList(
+    var vm = WeightedList(
       {"a":4,"ai":1,"e":4,"ee":2,"io":1,"oo":2,"i":4,"o":4,"u":2});
-    var ve = GenPwd.WeightedList(
+    var ve = WeightedList(
       {"a":2,"ee":1,"i":2,"io":1,"o":2,"oo":1,"y":2});
-    var vs = GenPwd.WeightedList(
+    var vs = WeightedList(
       {"a":1,"e":1,"i":1,"o":1});
 
 
@@ -287,7 +285,7 @@ Generator = (function () {
     var nextLetter = function (ltr, symbols, tr_matrix) {
       var row_idx = _.indexOf(symbols, ltr);
       var row = tr_matrix[row_idx];
-      var x = GenPwd.WeightedList(_.zipObject(symbols, row));
+      var x = WeightedList(_.zipObject(symbols, row));
       return x();
     };
 
