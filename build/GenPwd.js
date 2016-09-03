@@ -70,29 +70,33 @@ var Generator = Generator || {};
 Generator = (function () {
 
   // Random number string
+  // randomNumericString :: Integer -> String
   var randomNumericString = function (n) {
     return _.padStart(_.random(0, Math.pow(10,n)-1), n, "0");
   };
 
   // Wraps a function that returns a random element from the given list.
+  // RandomList :: Object -> (() -> String)
   var RandomList = function (t) {
     return function () {
-      // return t[_.random(0, t.length - 1)];
       return t[Math.floor(Math.random() * t.length)];
     };
   };
 
   // Return a function that randomly selects elements from a weighted list.
   // A weighted list simply has more copies of higher weighted elements.
+  // WeightedList :: Object -> (() -> String)
   var WeightedList = function (t) {
 
     // Return an array of n copies of x.
+    // repeat :: String -> Integer -> [String]
     var repeat = function (x, n) {
       return R.times(function (i) {return (x);}, n);
     };
 
     // Creates multiple versions of an element based on the count.
     // e.g. {"a":2, "b":3} -> ["a", "a", "b", "b", "b"]
+    // expandedList :: Object -> [String]
     var expandedList = R.chain(
       function (p) { return repeat(p[0], p[1]); },
       R.toPairs(t)
@@ -101,13 +105,81 @@ Generator = (function () {
     return RandomList(expandedList);
   };
 
-  var p =  RandomList(["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"]);
-  var cap = function (s) { return ($("#capitals:checked").length > 0 ? _.capitalize(s) : s); };
-  var punc = function () { return ($("#punctuation:checked").length > 0 ? p() : ""); };
-  var num = function (n) { return ($("#numbers:checked").length > 0 ? randomNumericString(n) : ""); };
+  var symbols =  ["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"];
+
+  var cap  = function (s) { return ($("#capitals:checked").length > 0 ? _.capitalize(s) : s); };
+  var punc = function () { return ($("#punctuation:checked").length > 0 ? RandomList(symbols)() : ""); };
+  var num  = function (n) { return ($("#numbers:checked").length > 0 ? randomNumericString(n) : ""); };
+
+
+  //---------------------------------
+  // Generator 0
+  // Experimentation with a functional approach
+
+  var generator0 = (function () {
+
+    // Override functions
+    // fpunc :: String -> String
+    var fpunc = function (s) {
+      return ($("#punctuation:checked").length > 0 ? R.concat(s, RandomList(symbols)()) : s);
+    };
+
+    // fnum :: Integer -> String -> String
+    var fnum = R.curry(function (n, s) {
+      return ($("#numbers:checked").length > 0 ? R.concat(s, randomNumericString(n)) : s);
+    });
+
+    // fcap :: String -> String
+    var fcap = function (s) { return ($("#capitals:checked").length > 0 ? _.capitalize(s) : s); };
+
+
+    var fWRandom = function (t, s) {
+      var repeat = function (x, n) {
+        return R.times(function (i) {return (x);}, n);
+      };
+      var expandedList = R.chain(
+        function (p) { return repeat(p[0], p[1]); },
+        R.toPairs(t)
+      );
+      return fRandom(expandedList, s);
+    };
+
+    // fRandom :: [String] -> String -> (String -> String)
+    var fRandom = function (t, s) {
+      return function (s) {
+        return R.concat(t[Math.floor(Math.random() * t.length)], s);
+      };
+    };
+
+    // c1 :: Object -> (() -> String)
+    var c1 = fWRandom(
+      {"b":2,"bl":1,"br":1,"c":2,"cr":1,"ch":2,"cl":1,"d":2,"f":2,"fl":1,
+        "fr":1,"g":2,"gl":1,"gr":1,"h":1,"j":2,"k":2,"l":2,"m":3,"n":2,"p":2,
+        "pl":1,"pr":1,"qu":1,"r":2,"s":3,"sh":2,"sk":1,"sl":1,"sm":1,"sn":1,
+        "st":2,"str":1,"t":3,"th":2,"thr":1,"tr":2,"tw":1,"v":2,"w":1,"z":2});
+
+    // c2 :: [String] -> (String -> String)
+    var c2 = fRandom(
+      ["b","bl","br","cr","ch","cl","d","f","fl","fr","g","gg", "gl","gr",
+        "h","j","k","l","m","n","p","pl","pp","pr","pt","qu","r","s","sh","sk",
+        "sl","sm","sn","st","str","t","th","thr","tr","tw","v","w","z"]);
+
+    // randomWord :: () -> String
+    var randomWord = function () {
+      var w;
+      w = R.pipe(c1, c2, fpunc, fnum(2));
+      return w("");
+    };
+
+    // Public data
+    return {randomWord: randomWord };
+  })();
 
   //---------------------------------
   // Generator 1
+
+  // A more functional version would look like this...
+  // case 0: w = R.pipe(syll1, punc, cap(c2), c2, c3)
 
   var generator1 = (function () {
     var c1 = WeightedList(
@@ -330,11 +402,14 @@ Generator = (function () {
   // Public
   return {
     generators: [
+      {"name": "Gen 0", "fn": "generator0"},
       {"name": "Gen 1", "fn": "generator1"},
       {"name": "Gen 2", "fn": "generator2"},
       {"name": "Gen 3", "fn": "generator3"},
       {"name": "Markov", "fn": "generator4", "default": true}
     ],
+    WeightedList: WeightedList,
+    generator0: generator0,
     generator1: generator1,
     generator2: generator2,
     generator3: generator3,
