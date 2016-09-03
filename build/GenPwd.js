@@ -2,8 +2,8 @@
 
 // Extend array to return a random element
 Array.prototype.randomElement = function () {
-  return this[_.random(0, this.length - 1)]
-}
+  return this[_.random(0, this.length - 1)];
+};
 
 //---------------------------------
 // Namespace: GenPwd
@@ -15,8 +15,8 @@ GenPwd = (function () {
   var Info = {
     name: "GenPwd",
     author: "AndrewJ",
-    version: "2.19",
-    date: "2016-07-23",
+    version: "2.20",
+    date: "2016-09-03",
     info: "GenPwd is a very simple password generator.",
     appendTo: function(tagName) {
       var str = "<div>";
@@ -26,7 +26,7 @@ GenPwd = (function () {
       $(tagName).append(str);
     },
     aboutText: function() {
-      str = this.name + " v" + this.version;
+      var str = this.name + " v" + this.version;
       str += ", last modified: " + this.date;
       str += " by: " + this.author + ".\n\n";
       str += this.info;
@@ -37,14 +37,14 @@ GenPwd = (function () {
 
   // Random number string
   var randomNumericString = function (n) {
-    return _.padStart(_.random(0, Math.pow(10,n)-1), n, "0")
-  }
+    return _.padStart(_.random(0, Math.pow(10,n)-1), n, "0");
+  };
 
   // List generators returning functions to call
   var RandomList = function (t) {
     return function () {
       return t.randomElement();
-    }
+    };
   };
 
   var WeightedList = function (t) {
@@ -55,23 +55,24 @@ GenPwd = (function () {
     });
     return function () {
       return expandedList.randomElement();
-    }
+    };
   };
 
   var initialise = function () {
     var fn;
     Info.appendTo("header");
     $.each(Generator.generators, function (i, gen) {
-      if (gen.default == true)
+      if (gen.default === true)
         fn = gen.fn + '" selected="true';
       else
-        fn = gen.fn
-      $('#gen').append($('<option value="' + fn + '">' + gen.name + '</option>'))
+        fn = gen.fn;
+      $('#gen').append($('<option value="' + fn + '">' + gen.name + '</option>'));
     });
   };
 
   var generate = function () {
-    var gen = eval('Generator.' + $('#gen').val());
+    var gen_opt = $('#gen').val();
+    var gen = Generator[gen_opt];
     $("#output").empty();
     for (var i=0; i < nwords; i++) {
       elt = $("<div class='word'></div>").append(gen.randomWord());
@@ -87,7 +88,7 @@ GenPwd = (function () {
     WeightedList: WeightedList,
     initialise: initialise,
     generate: generate
-  }
+  };
 
 })();
 
@@ -142,7 +143,7 @@ Generator = (function () {
         case 4:  w = c1() + v1() + cap(c1()) + v2() + c3() + punc(); break;
         case 5:  w = punc() + cap(c1()) + v2() + c3() + v3(); break;
         case 6:  w = c1() + v1() + cap(c2()) + punc() + v2() + c3(); break;
-        case 7:  w = c1() + v1() + cap(c1()) + v1() + c1() + v1() + punc(); break
+        case 7:  w = c1() + v1() + cap(c1()) + v1() + c1() + v1() + punc(); break;
         default: w = c1() + v1() + punc() + cap(c3()) + v3(); break;
       }
       w = (_.random(0, 2) < 1) ? w + num(2) : num(2) + w;
@@ -151,7 +152,7 @@ Generator = (function () {
     };
 
     // Public data
-    return {randomWord: randomWord }
+    return {randomWord: randomWord };
   })();
 
   //---------------------------------
@@ -170,8 +171,8 @@ Generator = (function () {
 
       var syll = function () {
         var x = c1() + v1();
-        if (_.random(0,4) == 0) x = x + "n";
-        return x
+        if (_.random(0,4) === 0) x = x + "n";
+        return x;
       };
 
       var c = _.random(0, 4);
@@ -241,7 +242,7 @@ Generator = (function () {
       }
       w = w + punc() + num(3);
       return w;
-    }
+    };
 
     // Public data
     return {randomWord: randomWord};
@@ -284,23 +285,23 @@ Generator = (function () {
 
     // Return a random next letter, given the transition matrix
     var nextLetter = function (ltr, symbols, tr_matrix) {
-      var row_idx = _.indexOf(symbols, ltr)
-      var row = tr_matrix[row_idx]
-      var x = GenPwd.WeightedList(_.zipObject(symbols, row))
+      var row_idx = _.indexOf(symbols, ltr);
+      var row = tr_matrix[row_idx];
+      var x = GenPwd.WeightedList(_.zipObject(symbols, row));
       return x();
-    }
+    };
 
     var randomCap = function (w) {
 
-    }
+    };
 
     // Generate a random word of a minimum and maximum length
     var randomWord = function () {
       var minLength = 4;
       var maxLength = 6;
+      var w = '';
 
       do {
-        var w = '';
         letter = ' ';
         do {
           letter = nextLetter(letter, allLetters, tr);
@@ -311,7 +312,7 @@ Generator = (function () {
 
       w = cap(w) + punc() + num(3); // add decorators
       return w;
-    }
+    };
 
     // Public data
     return {randomWord: randomWord};
@@ -330,7 +331,7 @@ Generator = (function () {
     generator2: generator2,
     generator3: generator3,
     generator4: generator4,
-  }
+  };
 
 })();
 
