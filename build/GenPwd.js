@@ -10,8 +10,8 @@ GenPwd = (function () {
   var Info = {
     name: "GenPwd",
     author: "AndrewJ",
-    version: "2.21",
-    date: "2016-09-03",
+    version: "2.22",
+    date: "2016-09-11",
     info: "GenPwd is a simple password generator.",
     appendTo: function(tagName) {
       var str = "<div>";
@@ -110,45 +110,23 @@ Generator = (function () {
 
   var symbols =  ["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"];
 
+  // cap :: String -> String
   var cap  = function (s) { return ($("#capitals:checked").length > 0 ? _.capitalize(s) : s); };
+
+  // punc :: () -> String
   var punc = function () { return ($("#punctuation:checked").length > 0 ? RandomList(symbols)() : ""); };
+
+  // num :: Int -> String
   var num  = function (n) { return ($("#numbers:checked").length > 0 ? randomNumericString(n) : ""); };
 
-  // Temporary hack
+  // Temporary hacks to reduce arity
   var num2 = function () { return num(2); };
   var num3 = function () { return num(3); };
+  var capF = function (f) { return R.compose(cap, f); };
 
   // Functional smarts
-  var crunch = function (f) { return R.join('', R.juxt(f)()); };
-
-  //---------------------------------
-  // Generator 0
-  // Experimentation with a functional approach
-
-  var generator0 = (function () {
-
-    // c1 :: Object -> (() -> String)
-    var c1 = WeightedList(
-      {"b":2,"bl":1,"br":1,"c":2,"cr":1,"ch":2,"cl":1,"d":2,"f":2,"fl":1,
-        "fr":1,"g":2,"gl":1,"gr":1,"h":1,"j":2,"k":2,"l":2,"m":3,"n":2,"p":2,
-        "pl":1,"pr":1,"qu":1,"r":2,"s":3,"sh":2,"sk":1,"sl":1,"sm":1,"sn":1,
-        "st":2,"str":1,"t":3,"th":2,"thr":1,"tr":2,"tw":1,"v":2,"w":1,"z":2});
-
-    // c2 :: [String] -> (String -> String)
-    var c2 = RandomList(
-      ["b","bl","br","cr","ch","cl","d","f","fl","fr","g","gg", "gl","gr",
-        "h","j","k","l","m","n","p","pl","pp","pr","pt","qu","r","s","sh","sk",
-        "sl","sm","sn","st","str","t","th","thr","tr","tw","v","w","z"]);
-
-    // randomWord :: () -> String
-    var randomWord = function () {
-      var f = [c1, R.compose(cap, c2), punc, num2];
-      return crunch(f);
-    };
-
-    // Public data
-    return { randomWord: randomWord };
-  })();
+  // crunch :: [() -> String] -> String
+  var crunch = function (f) { return R.join('', R.juxt(R.flatten(f))()); };
 
   //---------------------------------
   // Generator 1
@@ -179,22 +157,21 @@ Generator = (function () {
         "oa":2,"oo":2,"ow":2,"ua":1,"uo":1,"y":5});
 
     var randomWord = function () {
-      var syll1 = function () { return c1() + v1() + c2(); };
-      var w = "";
-      var c = _.random(0, 8);
-      switch (c) {
-        case 0:  w = syll1() + punc() + cap(c2()) + v2() + c3(); break;
-        case 1:  w = v1() + cap(c1()) + punc() + v2() + c3(); break;
-        case 2:  w = c1() + v1() + punc() + cap(c3()) + v3(); break;
-        case 3:  w = v1() + c1() + v1() + cap(c3()) + v3() + punc(); break;
-        case 4:  w = c1() + v1() + cap(c1()) + v2() + c3() + punc(); break;
-        case 5:  w = punc() + cap(c1()) + v2() + c3() + v3(); break;
-        case 6:  w = c1() + v1() + cap(c2()) + punc() + v2() + c3(); break;
-        case 7:  w = c1() + v1() + cap(c1()) + v1() + c1() + v1() + punc(); break;
-        default: w = c1() + v1() + punc() + cap(c3()) + v3(); break;
+      var syll1 = [c1, v1, c2]; 
+
+      var f;
+      switch (_.random(0, 8)) {
+        case 0:  f = [syll1, punc, capF(c2), v2, c3]; break;
+        case 1:  f = [v1, capF(c1), punc, v2, c3]; break;
+        case 2:  f = [c1, v1, punc, capF(c3), v3]; break;
+        case 3:  f = [v1, c1, v1, capF(c3), v3, punc]; break;
+        case 4:  f = [c1, v1, capF(c1), v2, c3, punc]; break;
+        case 5:  f = [punc, capF(c1), v2, c3, v3]; break;
+        case 6:  f = [c1, v1, capF(c2), punc, v2, c3]; break;
+        case 7:  f = [c1, v1, capF(c1), v1, c1, v1, punc]; break;
+        default: f = [c1, v1, punc, capF(c3), v3]; break;
       }
-      w = (_.random(0, 2) < 1) ? w + num(2) : num(2) + w;
-      // return c + ": " + w;
+      var w = (_.random(0, 2) < 1) ? crunch(f) + num(2) : num(2) + crunch(f);
       return w;
     };
 
@@ -213,25 +190,25 @@ Generator = (function () {
         "ch":2,"ky":1,"hy":1,"ry":2,"my":1,"ny":1,"by":1,"py":1});
     var v1 = WeightedList(
       {"a":2,"i":1,"u":2,"e":1,"o":2, "ou":1});
+    var n = WeightedList(
+      {"":4, "n":1});
 
     var randomWord = function () {
-      var w;
+      var syll = [capF(c1), v1, n];
 
-      var syll = function () {
-        var x = c1() + v1();
-        if (_.random(0,4) === 0) x = x + "n";
-        return x;
-      };
-
-      var c = _.random(0, 4);
-      switch (c) {
-        case 0: w = syll() + punc() + cap(syll()); break;
-        case 1: w = syll() + punc() + syll() + cap(syll()); break;
-        case 2: w = v1() + cap(syll()) + punc() + syll() ; break;
-        case 3: w = syll() + v1() + cap(syll()) + punc(); break;
-        default: w = syll() + cap(syll()) + punc();
+      var f;
+      switch (_.random(0, 4)) {
+        case 0:  f = [syll, punc, c1, v1]; break;
+        case 1:  f = [syll, punc, syll, c1, v1]; break;
+        case 2:  f = [v1, syll, punc, syll]; break;
+        case 3:  f = [punc, syll, syll]; break;
+        default: f = [syll, syll, punc]; break;
       }
-      w = (_.random(0, 2) < 1) ? w + num(2) : num(2) + w; // add a number at start or end
+
+      g = (_.random(0, 2) < 1) ? [f, num2] : [num2, f];
+
+      w = crunch(g); // Turn into a string
+
       w = w.replace(/[Tt]i/, "chi");
       w = w.replace(/[Ss]i/, "shi");
       w = w.replace(/[Hh]u/, "fu");
@@ -279,18 +256,18 @@ Generator = (function () {
 
 
     var randomWord = function () {
-      var w;
+      var f;
       switch (_.random(0, 6)) {
-        case 0: w = c() + vm() + cap(c()) + vm() + ce(); break;
-        case 1: w = cap(c()) + vm() + c() + ve(); break;
-        case 2: w = cs() + vm() + cap(c()) + vm() + c() + ve(); break;
-        case 3: w = cap(cs()) + vm() + c(); break;
-        case 4: w = vs() + c() + cap(c()) + ve(); break;
-        case 5: w = vs() + c() + cap(c()) + vm() + ce(); break;
-        case 6: w = cap(c()) + vm() + c() + vm() + c() + vm() + ce(); break;
+        case 0:  f = [c, vm, capF(c), vm, ce]; break;
+        case 1:  f = [capF(c), vm, c, ve]; break;
+        case 2:  f = [cs, vm, capF(c), vm, c, ve]; break;
+        case 3:  f = [capF(cs), vm, c]; break;
+        case 4:  f = [vs, c, capF(c), ve]; break;
+        case 5:  f = [vs, c, capF(c), vm, cs]; break;
+        default: f = [capF(c), vm, c, vm, c, vm, ce]; break;
       }
-      w = w + punc() + num(3);
-      return w;
+      w = (_.random(0, 1) === 0) ? [f, punc, num3] : [num3, f, punc];
+      return crunch(w);
     };
 
     // Public data
@@ -380,15 +357,12 @@ Generator = (function () {
   // Public data
   return {
     generators: [
-      // {"name": "Gen 0", "fn": "generator0"},
-      {"name": "Gen 0", "fn": "generator0"},
       {"name": "Gen 1", "fn": "generator1"},
       {"name": "Gen 2", "fn": "generator2"},
       {"name": "Gen 3", "fn": "generator3"},
       {"name": "Markov", "fn": "generator4", "default": true}
     ],
     WeightedList: WeightedList,
-    generator0: generator0,
     generator1: generator1,
     generator2: generator2,
     generator3: generator3,
