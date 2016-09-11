@@ -77,6 +77,7 @@ Generator = (function () {
     return _.padStart(_.random(0, Math.pow(10,n)-1), n, "0");
   };
 
+
   // Wraps a function that returns a random element from the given list.
   // RandomList :: Object -> (() -> String)
   var RandomList = function (t) {
@@ -113,6 +114,12 @@ Generator = (function () {
   var punc = function () { return ($("#punctuation:checked").length > 0 ? RandomList(symbols)() : ""); };
   var num  = function (n) { return ($("#numbers:checked").length > 0 ? randomNumericString(n) : ""); };
 
+  // Temporary hack
+  var num2 = function () { return num(2); };
+  var num3 = function () { return num(3); };
+
+  // Functional smarts
+  var crunch = function (f) { return R.join('', R.juxt(f)()); };
 
   //---------------------------------
   // Generator 0
@@ -120,61 +127,27 @@ Generator = (function () {
 
   var generator0 = (function () {
 
-    // Override functions
-    // fpunc :: String -> String
-    var fpunc = function (s) {
-      return ($("#punctuation:checked").length > 0 ? R.concat(s, RandomList(symbols)()) : s);
-    };
-
-    // fnum :: Integer -> String -> String
-    var fnum = R.curry(function (n, s) {
-      return ($("#numbers:checked").length > 0 ? R.concat(s, randomNumericString(n)) : s);
-    });
-
-    // fcap :: String -> String
-    var fcap = function (s) { return ($("#capitals:checked").length > 0 ? _.capitalize(s) : s); };
-
-
-    var fWRandom = function (t, s) {
-      var repeat = function (x, n) {
-        return R.times(function (i) {return (x);}, n);
-      };
-      var expandedList = R.chain(
-        function (p) { return repeat(p[0], p[1]); },
-        R.toPairs(t)
-      );
-      return fRandom(expandedList, s);
-    };
-
-    // fRandom :: [String] -> String -> (String -> String)
-    var fRandom = function (t, s) {
-      return function (s) {
-        return R.concat(t[Math.floor(Math.random() * t.length)], s);
-      };
-    };
-
     // c1 :: Object -> (() -> String)
-    var c1 = fWRandom(
+    var c1 = WeightedList(
       {"b":2,"bl":1,"br":1,"c":2,"cr":1,"ch":2,"cl":1,"d":2,"f":2,"fl":1,
         "fr":1,"g":2,"gl":1,"gr":1,"h":1,"j":2,"k":2,"l":2,"m":3,"n":2,"p":2,
         "pl":1,"pr":1,"qu":1,"r":2,"s":3,"sh":2,"sk":1,"sl":1,"sm":1,"sn":1,
         "st":2,"str":1,"t":3,"th":2,"thr":1,"tr":2,"tw":1,"v":2,"w":1,"z":2});
 
     // c2 :: [String] -> (String -> String)
-    var c2 = fRandom(
+    var c2 = RandomList(
       ["b","bl","br","cr","ch","cl","d","f","fl","fr","g","gg", "gl","gr",
         "h","j","k","l","m","n","p","pl","pp","pr","pt","qu","r","s","sh","sk",
         "sl","sm","sn","st","str","t","th","thr","tr","tw","v","w","z"]);
 
     // randomWord :: () -> String
     var randomWord = function () {
-      var w;
-      w = R.pipe(c1, c2, fpunc, fnum(2));
-      return w("");
+      var f = [c1, R.compose(cap, c2), punc, num2];
+      return crunch(f);
     };
 
     // Public data
-    return {randomWord: randomWord };
+    return { randomWord: randomWord };
   })();
 
   //---------------------------------
@@ -408,6 +381,7 @@ Generator = (function () {
   return {
     generators: [
       // {"name": "Gen 0", "fn": "generator0"},
+      {"name": "Gen 0", "fn": "generator0"},
       {"name": "Gen 1", "fn": "generator1"},
       {"name": "Gen 2", "fn": "generator2"},
       {"name": "Gen 3", "fn": "generator3"},
@@ -418,7 +392,7 @@ Generator = (function () {
     generator1: generator1,
     generator2: generator2,
     generator3: generator3,
-    generator4: generator4,
+    generator4: generator4
   };
 
 })();
