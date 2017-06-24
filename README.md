@@ -4,7 +4,7 @@ These are the available generators:
 * _generator1_: vaguely reminiscent of English
 * _generator2_: something resembling Japanese
 * _generator3_: another Englishy variant
-* _generator4_: a simple 1-character lookahead Markov chain, trainied on some English text. See the R project for the code.
+* _generator4_: a simple 1-character lookahead Markov chain, trained on some English text. See the R project for the code.
 
 # Caveats
 

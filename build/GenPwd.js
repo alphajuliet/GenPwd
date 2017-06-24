@@ -49,11 +49,12 @@ GenPwd = (function () {
     var gen = Generator[gen_opt];
 
     $(output).empty();
-    _.range(0, nwords).forEach(function (i) {
-      $(output).append(
-        $("<div class='word'></div>").append(gen.randomWord())
-      );
-    });
+    R.forEach(
+      function (i) {
+        $(output).append(
+          $("<div class='word'></div>").append(gen.randomWord()));
+      }, 
+      R.range(0, nwords));
   };
 
   // Public data

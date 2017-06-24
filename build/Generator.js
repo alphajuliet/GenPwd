@@ -1,3 +1,6 @@
+// Generator.js
+// aj
+
 //---------------------------------
 // Namespace: Generator
 
@@ -41,16 +44,32 @@ Generator = (function () {
     return RandomList(expandedList);
   };
 
+  // Apply a function only if the box is checked
+  // e.g. doIfChecked(R.toUpper, '#box1')('abcd')
+  var doIfChecked = function (f, id) {
+    return $(id).is(':checked') ? f : R.identity;
+  }
+
+  // Transform a random element in an array
+  // trRandElement :: (a -> a) -> [a] -> [a]
+  var trRandElement = R.curry(function (f, arr) { 
+    var idx = Math.floor(Math.random() * arr.length);
+    return R.join('', R.update(idx, f(arr[idx]), arr));
+  });
+
   var symbols =  ["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"];
 
   // cap :: String -> String
   var cap  = function (s) { return ($("#capitals:checked").length > 0 ? _.capitalize(s) : s); };
 
+  // Uppercase a random letter
+  var ranUpper = trRandElement(R.toUpper);
+
   // punc :: () -> String
-  var punc = function () { return ($("#punctuation:checked").length > 0 ? RandomList(symbols)() : ""); };
+  var punc = function () { return($('#punctuation').is(':checked') ? RandomList(symbols)() : "") };
 
   // num :: Int -> String
-  var num  = function (n) { return ($("#numbers:checked").length > 0 ? randomNumericString(n) : ""); };
+  var num  = function (n) { return ($('#numbers').is(':checked') ? randomNumericString(n) : ""); };
 
   // Temporary hacks to reduce arity
   var num2 = function () { return num(2); };
@@ -246,22 +265,22 @@ Generator = (function () {
     ];
 
     // Return a random next letter, given the transition matrix
-    var nextLetter = function (ltr, symbols, tr_matrix) {
-      var row_idx = _.indexOf(symbols, ltr);
-      var row = tr_matrix[row_idx];
+    // nextLetter :: Char -> [Char] -> [[Float]] -> Char
+    var nextLetter = function (tr_matrix, symbols, ltr) {
+      var row_index = _.indexOf(symbols, ltr);
+      var row = tr_matrix[row_index];
 
-      // Normalise the probabilities to integers for the weighted list.
-      var round = R.flip(R.curry(Math.round));
-      var multiplier = 1 / R.reduce(R.min, Infinity, R.filter(function (x) { return (x > 0); }, row));
-      var int_row = R.map(R.compose(round(1), R.multiply(multiplier)), row);
+      // Round the probabilities to splits across 100
+      var roundf = R.flip(R.curry(Math.round));
+      var int_row = R.map(R.compose(roundf(1), R.multiply(100)), row);
 
-      var x = WeightedList(R.zipObj(symbols, int_row));
-      return x();
+      // Generate a bag of letters and pick one
+      var listf = WeightedList(R.zipObj(symbols, int_row));
+      return listf();
     };
 
-    var randomCap = function (w) {
-
-    };
+    // Pre-calculate all the weighted lists
+    // var allLists = R.map(nextLetter(symbols, tr_matrix), symbols)
 
     // Generate a random word of a minimum and maximum length
     var randomWord = function () {
@@ -272,13 +291,13 @@ Generator = (function () {
       do {
         letter = ' ';
         do {
-          letter = nextLetter(letter, allLetters, tr);
+          letter = nextLetter(tr, allLetters, letter);
           w = w + letter;
         } while (letter != ' ' && w.length < maxLength);
         w = $.trim(w);
       } while (w.length < minLength);
 
-      w = cap(w) + punc() + num(3); // add decorators
+      w = doIfChecked(ranUpper, "#capitals")(w) + punc() + num(3); // add decorators
       return w;
     };
 
