@@ -7,6 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
 ```
 
 # Description
@@ -15,34 +16,46 @@ Generate a Markov chain transition probability matrix from given text, to be use
 
 # Setup
 
-```{r echo = FALSE, results = FALSE}
-library(dplyr)
-library(tibble)
-library(tidyr)
-library(ggplot2)
-library(tm)
+```{r echo = FALSE, message = FALSE, results = FALSE}
+library(tidyverse)
+library(tidytext)
+library(stringr)
 library(markovchain)
+library(gutenbergr)
 ```
 
 # Read in all sample text
 
 ```{r}
-txt <- VCorpus(DirSource(pattern = "sample-[0-9]+.txt")) %>%
-  tm_map(removePunctuation) %>%
-  tm_map(content_transformer(tolower)) %>%
-  tm_map(removeWords, stopwords("english")) 
+#txt_raw <- read_lines("input.txt") %>%
+#  tibble(line = 1:length(.), text = .) %>%
+#  unnest_tokens(word, text, token = "words")
+```
 
-words <- as.character(txt[[1]]) %>% 
-  paste(collapse = "") %>%
-  gsub("  ", " ", x = .) %>%
-  strsplit(split = '') %>%
-  unlist
+# Source text from Project Gutenberg
+```{r}
+hgwells <- gutenberg_download(c(35, 36, 5230, 159))
+```
+
+```{r}
+txt <- 
+  hgwells %>%
+  unnest_tokens(char, text)
 ```
 
 # Generate transition matrix
 
+Split into characters, but keep inter-word spaces.
 ```{r}
-chain <- markovchainFit(words, method = "mle")
+chars <- txt %>%
+  pull(char) %>%
+  str_replace("[0-9,.\\-']+", "") %>%
+  str_replace("$", " ") %>%
+  str_c(collapse = '') %>%
+  str_split("") %>%
+  unlist
+
+chain <- markovchainFit(chars, method = "mle")
 transitions <- chain$estimate@transitionMatrix
 ```
 
