@@ -13,12 +13,16 @@ Generator = (function () {
     return _.padStart(_.random(0, Math.pow(10,n)-1), n, "0");
   };
 
+  // Random 0 to n-1
+  var dice = function (n) {
+    return Math.floor(Math.random() * n)
+  }
 
   // Wraps a function that returns a random element from the given list.
   // RandomList :: Object -> (() -> String)
   var RandomList = function (t) {
     return function () {
-      return t[Math.floor(Math.random() * t.length)];
+      return t[dice(t.length)];
     };
   };
 
@@ -44,32 +48,30 @@ Generator = (function () {
     return RandomList(expandedList);
   };
 
+  //---------------------------------
+  var isChecked = function (id) { return $(id).is(':checked') };
+
   // Apply a function only if the box is checked
   // e.g. doIfChecked(R.toUpper, '#box1')('abcd')
   var doIfChecked = function (f, id) {
-    return $(id).is(':checked') ? f : R.identity;
+    return isChecked(id) ? f : R.identity;
   }
 
   // Transform a random element in an array
   // trRandElement :: (a -> a) -> [a] -> [a]
   var trRandElement = R.curry(function (f, arr) { 
-    var idx = Math.floor(Math.random() * arr.length);
+    var idx = dice(arr.length);
     return R.join('', R.update(idx, f(arr[idx]), arr));
   });
 
   var symbols =  ["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"];
 
-  // cap :: String -> String
-  var cap  = function (s) { return ($("#capitals:checked").length > 0 ? _.capitalize(s) : s); };
+  var cap  = function (s) { return isChecked("#capitals") ? _.capitalize(s) : s; };
+  var punc = function ()  { return isChecked("#punctuation") ? RandomList(symbols)() : "" };
+  var num  = function (n) { return isChecked("#numbers") ? randomNumericString(n) : "" };
 
   // Uppercase a random letter
   var ranUpper = trRandElement(R.toUpper);
-
-  // punc :: () -> String
-  var punc = function () { return($('#punctuation').is(':checked') ? RandomList(symbols)() : "") };
-
-  // num :: Int -> String
-  var num  = function (n) { return ($('#numbers').is(':checked') ? randomNumericString(n) : ""); };
 
   // Temporary hacks to reduce arity
   var num2 = function () { return num(2); };
@@ -112,7 +114,7 @@ Generator = (function () {
       var syll1 = [c1, v1, c2]; 
 
       var f;
-      switch (_.random(0, 8)) {
+      switch (dice(8)) {
         case 0:  f = [syll1, punc, capF(c2), v2, c3]; break;
         case 1:  f = [v1, capF(c1), punc, v2, c3]; break;
         case 2:  f = [c1, v1, punc, capF(c3), v3]; break;
@@ -123,7 +125,7 @@ Generator = (function () {
         case 7:  f = [c1, v1, capF(c1), v1, c1, v1, punc]; break;
         default: f = [c1, v1, punc, capF(c3), v3]; break;
       }
-      var w = (_.random(0, 2) < 1) ? crunch(f) + num(2) : num(2) + crunch(f);
+      var w = (dice(2) < 1) ? crunch(f) + num(2) : num(2) + crunch(f);
       return w;
     };
 
@@ -143,13 +145,13 @@ Generator = (function () {
     var v1 = WeightedList(
       {"a":2,"i":1,"u":2,"e":1,"o":2, "ou":1});
     var n = WeightedList(
-      {"":4, "n":1});
+      {"":5, "n":1});
 
     var randomWord = function () {
       var syll = [capF(c1), v1, n];
 
       var f;
-      switch (_.random(0, 4)) {
+      switch (dice(4)) {
         case 0:  f = [syll, punc, c1, v1]; break;
         case 1:  f = [syll, punc, syll, c1, v1]; break;
         case 2:  f = [v1, syll, punc, syll]; break;
@@ -157,7 +159,7 @@ Generator = (function () {
         default: f = [syll, syll, punc]; break;
       }
 
-      g = (_.random(0, 2) < 1) ? [f, num2] : [num2, f];
+      g = (dice(2) < 1) ? [f, num2] : [num2, f];
 
       w = crunch(g); // Turn into a string
 
@@ -209,7 +211,7 @@ Generator = (function () {
 
     var randomWord = function () {
       var f;
-      switch (_.random(0, 6)) {
+      switch (dice(6)) {
         case 0:  f = [c, vm, capF(c), vm, ce]; break;
         case 1:  f = [capF(c), vm, c, ve]; break;
         case 2:  f = [cs, vm, capF(c), vm, c, ve]; break;
@@ -218,7 +220,7 @@ Generator = (function () {
         case 5:  f = [vs, c, capF(c), vm, cs]; break;
         default: f = [capF(c), vm, c, vm, c, vm, ce]; break;
       }
-      w = (_.random(0, 1) === 0) ? [f, punc, num3] : [num3, f, punc];
+      w = (dice(2) < 1) ? [f, punc, num3] : [num3, f, punc];
       return crunch(w);
     };
 
@@ -284,8 +286,8 @@ Generator = (function () {
 
     // Generate a random word of a minimum and maximum length
     var randomWord = function () {
-      var minLength = 4;
-      var maxLength = 6;
+      var minLength = 5;
+      var maxLength = 7;
       var w = '';
 
       do {
@@ -297,7 +299,11 @@ Generator = (function () {
         w = $.trim(w);
       } while (w.length < minLength);
 
-      w = doIfChecked(ranUpper, "#capitals")(w) + punc() + num(3); // add decorators
+      if (dice(2) < 1)
+        w = doIfChecked(ranUpper, "#capitals")(w) + punc() + num(3); // add decorators
+      else
+        w = num(3) + punc() + doIfChecked(ranUpper, "#capitals")(w)
+
       return w;
     };
 

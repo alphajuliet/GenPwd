@@ -46,6 +46,11 @@ GenPwd = (function () {
   var generate = function (output) {
     var nwords = 10;
     var gen_opt = $('#gen').val();
+    var options = {
+      "capitals": $('#capitals').is(':checked'),
+      "punctuation": $('#punctuation').is(':checked'),
+      "numbers": $('#numbers').is(':checked')
+    };
     var gen = Generator[gen_opt];
 
     $(output).empty();
