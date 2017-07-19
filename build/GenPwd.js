@@ -10,8 +10,8 @@ GenPwd = (function () {
   var Info = {
     name: "GenPwd",
     author: "AndrewJ",
-    version: "2.25",
-    date: "2017-06-25",
+    version: "2.26",
+    date: "2017-07-19",
     info: "GenPwd is a simple password generator.",
     appendTo: function(tagName) {
       var str = "<div>";
@@ -40,13 +40,14 @@ GenPwd = (function () {
         fn = gen.fn;
       $('#gen').append($('<option value="' + fn + '">' + gen.name + '</option>'));
     });
+    $('#clipboard').hide();
   };
 
   // Main function to generate a list of random words, based on the chosen generator.
   var generate = function (output) {
     var nwords = 10;
     var gen_opt = $('#gen').val();
-    var options = {
+    var options = { // unused for now
       "capitals": $('#capitals').is(':checked'),
       "punctuation": $('#punctuation').is(':checked'),
       "numbers": $('#numbers').is(':checked')
@@ -56,10 +57,21 @@ GenPwd = (function () {
     $(output).empty();
     R.forEach(
       function (i) {
-        $(output).append(
-          $("<div class='word'></div>").append(gen.randomWord()));
+        $(output)
+          .append($("<div class='word'></div>")
+            .append(gen.randomWord()));
       }, 
       R.range(0, nwords));
+
+    // Copy to clipboard functionality
+    $('#clipboard').show();
+    $('.word').click(function () {
+      $('#copy-text').attr("value", $(this).text());
+    });
+
+    var clipboard = new Clipboard('.copy-button');
+    clipboard.on('error', function(e) { console.log(e); });
+
   };
 
   // Public data

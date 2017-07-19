@@ -1,3 +1,5 @@
+/* main.css */
+
 body { 
   font-family: Helvetica Neue, Geneva, Arial, sans-serif; 
   font-weight: lighter;
@@ -7,29 +9,97 @@ body {
 }
 
 header p { margin: 2pt; }
-header .title { font-size: 20pt; color: #639; }
+header .title { 
+  font-size: 20pt; 
+  color: #639; 
+}
 footer { 
   font-size: 8pt;
 }
+
 #container { padding-top: 5pt; }
 #output { margin-top: 5pt; }
-#output .word { font-size: 125%; margin: 3pt 0pt; padding-left: 5pt; }
-#output .word:nth-child(even) { background-color: #eef; } 
-#controls { 
-  background-color: #ddf; 
-  border-radius: 5px;
-  padding: 2pt;
+
+/* -----------------------------
+ * Words
+ */
+
+.word { 
+  font-size: 125%; 
+  margin: 2pt 0pt; 
+  display: block; 
+  padding: 4pt 0pt;
+  border-color: #ccc;
+  border-width: 0px 0px 1px 0px;
+  border-style: solid;
 }
-#controls div { display: inline; margin: 4pt 4pt; }
+/* .word:nth-child(even) { background-color: #eef; } */ 
+
+
+/* -----------------------------
+ * Controls
+ */
+
+#controls { 
+  background-color: #eef; 
+  border-radius: 5px;
+  padding: 2pt 2pt;
+}
+#controls div { 
+  display: inline; 
+  margin: 4pt 2pt; 
+}
+
 .button { 
-  padding: 4pt 6pt;
+  padding: 4pt 4pt;
   margin: 6pt 4pt;
   background-color: #6ff; 
   border: solid 1px #666; 
   border-radius: 5px;
+  cursor: pointer;
 }
+
 .button:hover { background-color: #f9f; }
 .description { font-size: 80%; font-weight: normal; color: #ccc; }
+
+#clipboard {
+  display: table;
+  margin: 6pt 0pt;
+  color: #999;
+  min-height: 14pt;
+  vertical-align: middle;
+}
+#copy-text { 
+  color: #999;
+  border: 1px solid #666; 
+  padding: 3pt 5pt;
+  vertical-align: middle;
+}
+.copy-button { 
+  position: relative;
+  border: 1px solid #666; 
+  margin-left: -1px;
+  top: -1px;
+  cursor: pointer;
+  background-color: #f4f4f4; 
+  vertical-align: middle;
+}
+.copy-button:hover, img:hover { background-color: #f9f; }
+
+img {
+  position: relative;
+  background-color: #f4f4f4; 
+  width: 13px;
+  padding: 0 2px;
+  border: 0;
+  vertical-align: middle;
+}
+
+
+/* -----------------------------
+ * Format for mobile
+ */
+
 @media screen {
   body { 
     font-family: Helvetica;

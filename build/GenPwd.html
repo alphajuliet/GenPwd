@@ -21,21 +21,29 @@
 		<header></header>
 		<div id="container">
 			<div id="controls">
+				<div><input class="button" type="button" value="Go!" onclick="GenPwd.generate('#output');"/></div>
+				<div><select id="gen"></select></div>
 				<div><input type="checkbox" id="punctuation" checked /> Punctuation</div>
 				<div><input type="checkbox" id="numbers" checked /> Numbers </div>
 				<div><input type="checkbox" id="capitals" checked /> Capitals </div>
-				<div>
-					<select id="gen"></select>
-				</div>
-				<div><input class="button" type="button" value="Go!" onclick="GenPwd.generate('#output');"/></div>
 			</div>
-			<div id="output"><div>Click on Go!</div></div>
+			<div id="output">
+        <div>Click on Go!</div>
+      </div>
+      <div id="clipboard">
+        <span>Copy to clipboard: </span>
+        <input id="copy-text" type="text" value="" />
+        <button class="copy-button"  data-clipboard-target="#copy-text">
+          <img id="clippy" src="clippy.svg" alt="Copy to clipboard" />
+        </button>
+      </div>
 		</div>
     <footer></footer>
 
     <script src="lib/jquery-3.0.0.min.js"></script>
     <script src="lib/lodash-4.13.1.min.js"></script>
     <script src="lib/ramda-0.22.1.min.js"></script>
+    <script src="lib/clipboard.min.js"></script>
     <script src="GenPwd.js"></script>
     <script src="Generator.js"></script>
 		<script type="text/javascript">
