@@ -7,10 +7,17 @@
 var Generator = Generator || {};
 Generator = (function () {
 
-  // Random number string
+
+  // Capitalise a word
+  var capitalise = function (s) {
+    return s.replace(/^[a-z]/, s => s.toUpperCase());
+  }
+
+  // Random number string in range [0, 10^n), padded to n digits
   // randomNumericString :: Integer -> String
   var randomNumericString = function (n) {
-    return _.padStart(_.random(0, Math.pow(10,n)-1), n, "0");
+    var x = Math.random() * (Math.pow(10, n)-1);
+    return String("0000000000" + x).slice(-n);
   };
 
   // Random 0 to n-1
@@ -66,7 +73,7 @@ Generator = (function () {
 
   var symbols =  ["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"];
 
-  var cap  = function (s) { return isChecked("#capitals") ? _.capitalize(s) : s; };
+  var cap  = function (s) { return isChecked("#capitals") ? capitalise(s) : s; };
   var punc = function ()  { return isChecked("#punctuation") ? RandomList(symbols)() : "" };
   var num  = function (n) { return isChecked("#numbers") ? randomNumericString(n) : "" };
 
@@ -272,7 +279,7 @@ Generator = (function () {
     // Return a random next letter, given the transition matrix
     // nextLetter :: Char -> [Char] -> [[Float]] -> Char
     var nextLetter = function (tr_matrix, symbols, ltr) {
-      var row_index = _.indexOf(symbols, ltr);
+      var row_index = R.indexOf(ltr, symbols);
       var row = tr_matrix[row_index];
 
       // Round the probabilities to splits across 100
