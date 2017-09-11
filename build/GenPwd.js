@@ -10,8 +10,8 @@ GenPwd = (function () {
   var Info = {
     name: "GenPwd",
     author: "AndrewJ",
-    version: "2.27",
-    date: "2017-09-10",
+    version: "2.28",
+    date: "2017-09-11",
     info: "GenPwd is a simple password generator.",
     appendTo: function(tagName) {
       var str = "<div>";
