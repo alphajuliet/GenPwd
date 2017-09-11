@@ -44,14 +44,8 @@ GenPwd = (function () {
   };
 
   // Main function to generate a list of random words, based on the chosen generator.
-  var generate = function (output) {
+  var generate = function (output, gen_opt, opts) {
     var nwords = 10;
-    var gen_opt = $('#gen').val();
-    var options = { // unused for now
-      "capitals": $('#capitals').is(':checked'),
-      "punctuation": $('#punctuation').is(':checked'),
-      "numbers": $('#numbers').is(':checked')
-    };
     var gen = Generator[gen_opt];
 
     $(output).empty();
@@ -59,7 +53,7 @@ GenPwd = (function () {
       function (i) {
         $(output)
           .append($("<div class='word'></div>")
-            .append(gen.randomWord()));
+            .append(gen.randomWord(opts)));
       }, 
       R.range(0, nwords));
 

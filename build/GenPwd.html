@@ -21,7 +21,7 @@
 		<header></header>
 		<div id="container">
 			<div id="controls">
-				<div><input class="button" type="button" value="Go!" onclick="GenPwd.generate('#output');"/></div>
+				<div><input class="button" type="button" value="Go!" onclick="go();"/></div>
 				<div><select id="gen"></select></div>
 				<div><input type="checkbox" id="punctuation" checked /> Punctuation</div>
 				<div><input type="checkbox" id="numbers" checked /> Numbers </div>
@@ -48,8 +48,17 @@
 		<script type="text/javascript">
 		<!--
 			// $(GenPwd.initialise);
+      var go = function () {
+        var opts = {
+          "capitals": $('#capitals').is(':checked'),
+          "punctuation": $('#punctuation').is(':checked'),
+          "numbers": $('#numbers').is(':checked')
+        };
+        var gen = $('#gen').val();
+        GenPwd.generate('#output', gen, opts);
+      };
 			$(document).ready(function() {
-					GenPwd.initialise()
+        GenPwd.initialise()
 			});
     -->
 		</script>

@@ -9,18 +9,22 @@ Generator = (function () {
 
 
   // Capitalise a word
+  // capitalise :: String -> String
   var capitalise = function (s) {
     return s.replace(/^[a-z]/, s => s.toUpperCase());
   }
 
   // Random number string in range [0, 10^n), padded to n digits
-  // randomNumericString :: Integer -> String
+  // randomNumericString :: Integer -> (() -> String)
   var randomNumericString = function (n) {
-    var x = Math.random() * (Math.pow(10, n)-1);
-    return String("0000000000" + x).slice(-n);
+    return function () {
+      var x = Math.random() * (Math.pow(10, n)-1);
+      return String("0000000000" + x).slice(-n);
+    };
   };
 
   // Random 0 to n-1
+  // dice :: Integer -> Integer
   var dice = function (n) {
     return Math.floor(Math.random() * n)
   }
@@ -58,12 +62,6 @@ Generator = (function () {
   //---------------------------------
   var isChecked = function (id) { return $(id).is(':checked') };
 
-  // Apply a function only if the box is checked
-  // e.g. doIfChecked(R.toUpper, '#box1')('abcd')
-  var doIfChecked = function (f, id) {
-    return isChecked(id) ? f : R.identity;
-  }
-
   // Transform a random element in an array
   // trRandElement :: (a -> a) -> [a] -> [a]
   var trRandElement = R.curry(function (f, arr) { 
@@ -73,19 +71,11 @@ Generator = (function () {
 
   var symbols =  ["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"];
 
-  var cap  = function (s) { return isChecked("#capitals") ? capitalise(s) : s; };
-  var punc = function ()  { return isChecked("#punctuation") ? RandomList(symbols)() : "" };
-  var num  = function (n) { return isChecked("#numbers") ? randomNumericString(n) : "" };
+  // emptyStringF :: () -> String
+  var emptyStringF = function () { return "" };
 
-  // Uppercase a random letter
-  var ranUpper = trRandElement(R.toUpper);
-
-  // Temporary hacks to reduce arity
-  var num2 = function () { return num(2); };
-  var num3 = function () { return num(3); };
-  var capF = function (f) { return R.compose(cap, f); };
-
-  // Functional smarts
+  // Functional "smarts"
+  // Call each function in the list and concatenate the results.
   // crunch :: [() -> String] -> String
   var crunch = function (f) { return R.join('', R.juxt(R.flatten(f))()); };
 
@@ -117,23 +107,28 @@ Generator = (function () {
       {"a":5,"ao":1,"e":5,"ea":1,"ee":2,"eo":1,"i":2,"ia":2,"io":2,"o":5,
         "oa":2,"oo":2,"ow":2,"ua":1,"uo":1,"y":5});
 
-    var randomWord = function () {
+    var randomWord = function (opts) {
+
+      var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
+      var numF  = function (n) { return opts["numbers"] ? randomNumericString(n) : emptyStringF };
+      var capF  = opts["capitals"] ? function (f) { return R.compose(capitalise, f) } : R.identity ;
+
       var syll1 = [c1, v1, c2]; 
 
       var f;
       switch (dice(8)) {
-        case 0:  f = [syll1, punc, capF(c2), v2, c3]; break;
-        case 1:  f = [v1, capF(c1), punc, v2, c3]; break;
-        case 2:  f = [c1, v1, punc, capF(c3), v3]; break;
-        case 3:  f = [v1, c1, v1, capF(c3), v3, punc]; break;
-        case 4:  f = [c1, v1, capF(c1), v2, c3, punc]; break;
-        case 5:  f = [punc, capF(c1), v2, c3, v3]; break;
-        case 6:  f = [c1, v1, capF(c2), punc, v2, c3]; break;
-        case 7:  f = [c1, v1, capF(c1), v1, c1, v1, punc]; break;
-        default: f = [c1, v1, punc, capF(c3), v3]; break;
+        case 0:  f = [syll1, puncF, capF(c2), v2, c3]; break;
+        case 1:  f = [v1, capF(c1), puncF, v2, c3]; break;
+        case 2:  f = [c1, v1, puncF, capF(c3), v3]; break;
+        case 3:  f = [v1, c1, v1, capF(c3), v3, puncF]; break;
+        case 4:  f = [c1, v1, capF(c1), v2, c3, puncF]; break;
+        case 5:  f = [puncF, capF(c1), v2, c3, v3]; break;
+        case 6:  f = [c1, v1, capF(c2), puncF, v2, c3]; break;
+        case 7:  f = [c1, v1, capF(c1), v1, c1, v1, puncF]; break;
+        default: f = [c1, v1, puncF, capF(c3), v3]; break;
       }
-      var w = (dice(2) < 1) ? crunch(f) + num(2) : num(2) + crunch(f);
-      return w;
+      var w = (dice(2) < 1) ?  [f, numF(2)] : [numF(2), f];
+      return crunch(w);
     };
 
     // Public data
@@ -154,21 +149,26 @@ Generator = (function () {
     var n = WeightedList(
       {"":5, "n":1});
 
-    var randomWord = function () {
+    var randomWord = function (opts) {
+
+      var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
+      var numF  = function (n) { return opts["numbers"] ? randomNumericString(n) : emptyStringF };
+      var capF  = opts["capitals"] ? function (f) { return R.compose(capitalise, f) } : R.identity ;
+
       var syll = [capF(c1), v1, n];
 
       var f;
       switch (dice(4)) {
-        case 0:  f = [syll, punc, c1, v1]; break;
-        case 1:  f = [syll, punc, syll, c1, v1]; break;
-        case 2:  f = [v1, syll, punc, syll]; break;
+        case 0:  f = [syll, puncF, c1, v1]; break;
+        case 1:  f = [syll, puncF, syll, c1, v1]; break;
+        case 2:  f = [v1, syll, puncF, syll]; break;
         case 3:  f = [punc, syll, syll]; break;
-        default: f = [syll, syll, punc]; break;
+        default: f = [syll, syll, puncF]; break;
       }
 
-      g = (dice(2) < 1) ? [f, num2] : [num2, f];
+      var g = (dice(2) < 1) ? [f, numF(2)] : [numF(2), f];
 
-      w = crunch(g); // Turn into a string
+      var w = crunch(g); // Turn into a string
 
       w = w.replace(/[Tt]i/, "chi");
       w = w.replace(/[Ss]i/, "shi");
@@ -216,7 +216,12 @@ Generator = (function () {
       {"a":1,"e":1,"i":1,"o":1});
 
 
-    var randomWord = function () {
+    var randomWord = function (opts) {
+
+      var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
+      var numF  = function (n) { return opts["numbers"] ? randomNumericString(n) : emptyStringF };
+      var capF  = opts["capitals"] ? function (f) { return R.compose(capitalise, f) } : R.identity ;
+
       var f;
       switch (dice(6)) {
         case 0:  f = [c, vm, capF(c), vm, ce]; break;
@@ -227,7 +232,8 @@ Generator = (function () {
         case 5:  f = [vs, c, capF(c), vm, cs]; break;
         default: f = [capF(c), vm, c, vm, c, vm, ce]; break;
       }
-      w = (dice(2) < 1) ? [f, punc, num3] : [num3, f, punc];
+
+      var w = (dice(2) < 1) ? [f, puncF, numF(2)] : [numF(2), f, puncF];
       return crunch(w);
     };
 
@@ -295,27 +301,33 @@ Generator = (function () {
     // var allLists = R.map(nextLetter(symbols, tr_matrix), symbols)
 
     // Generate a random word of a minimum and maximum length
-    var randomWord = function () {
-      var minLength = 5;
-      var maxLength = 7;
-      var w = '';
+    var randomWord = function (opts) {
+      var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
+      var numF  = function (n) { return opts["numbers"] ? randomNumericString(n) : emptyStringF };
+      var capF  = opts["capitals"] ? function (f) { return R.compose(capitalise, f) } : R.identity ;
 
-      do {
-        letter = RandomList(R.slice(3, 29, allLetters))();
-        w = letter;
+      var word = function () {
+        var minLength = 5;
+        var maxLength = 7;
+        var w = '';
+
         do {
-          letter = nextLetter(tr, allLetters, letter);
-          w = w + letter;
-        } while (letter != ' ' && w.length < maxLength);
-        w = $.trim(w);
-      } while (w.length < minLength);
+          letter = RandomList(R.slice(3, 29, allLetters))();
+          w = letter;
+          do {
+            letter = nextLetter(tr, allLetters, letter);
+            w = w + letter;
+          } while (letter != ' ' && w.length < maxLength);
+          w = $.trim(w);
+        } while (w.length < minLength);
+        return w;
+      }
 
-      if (dice(2) < 1)
-        w = doIfChecked(ranUpper, "#capitals")(w) + punc() + num(3); // add decorators
-      else
-        w = num(3) + punc() + doIfChecked(ranUpper, "#capitals")(w)
+      var f = (dice(2) < 1) ? 
+        [capF(word), puncF, numF(3)] :
+        [numF(3), puncF, capF(word)];
 
-      return w;
+      return crunch(f);
     };
 
     // Public data
