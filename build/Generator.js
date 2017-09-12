@@ -10,9 +10,7 @@ Generator = (function () {
 
   // Capitalise a word
   // capitalise :: String -> String
-  var capitalise = function (s) {
-    return s.replace(/^[a-z]/, s => s.toUpperCase());
-  }
+  var capitalise = s => s.replace(/^[a-z]/, s => s.toUpperCase());
 
   // Random number string in range [0, 10^n), padded to n digits
   // randomNumericString :: Integer -> (() -> String)
@@ -25,17 +23,11 @@ Generator = (function () {
 
   // Random 0 to n-1
   // dice :: Integer -> Integer
-  var dice = function (n) {
-    return Math.floor(Math.random() * n)
-  }
+  var dice = n => Math.floor(Math.random() * n);
 
   // Wraps a function that returns a random element from the given list.
   // RandomList :: Object -> (() -> String)
-  var RandomList = function (t) {
-    return function () {
-      return t[dice(t.length)];
-    };
-  };
+  var RandomList = t => () => t[dice(t.length)];
 
   // Return a function that randomly selects elements from a weighted list.
   // A weighted list simply has more copies of higher weighted elements.
@@ -44,15 +36,13 @@ Generator = (function () {
 
     // Return an array of n copies of x.
     // repeat :: String -> Integer -> [String]
-    var repeat = function (x, n) {
-      return R.times(function (i) {return (x);}, n);
-    };
+    var repeat = (x, n) => R.times(i => x, n);
 
     // Creates multiple versions of an element based on the count.
     // e.g. {"a":2, "b":3} -> ["a", "a", "b", "b", "b"]
     // expandedList :: Object -> [String]
     var expandedList = R.chain(
-      function (p) { return repeat(p[0], p[1]); },
+      p => repeat(p[0], p[1]),
       R.toPairs(t)
     );
 
@@ -60,8 +50,6 @@ Generator = (function () {
   };
 
   //---------------------------------
-  var isChecked = function (id) { return $(id).is(':checked') };
-
   // Transform a random element in an array
   // trRandElement :: (a -> a) -> [a] -> [a]
   var trRandElement = R.curry(function (f, arr) { 
@@ -77,7 +65,7 @@ Generator = (function () {
   // Functional "smarts"
   // Call each function in the list and concatenate the results.
   // crunch :: [() -> String] -> String
-  var crunch = function (f) { return R.join('', R.juxt(R.flatten(f))()); };
+  var crunch = f => R.join('', R.juxt(R.flatten(f))());
 
   //---------------------------------
   // Generator 1
@@ -110,8 +98,8 @@ Generator = (function () {
     var randomWord = function (opts) {
 
       var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
-      var numF  = function (n) { return opts["numbers"] ? randomNumericString(n) : emptyStringF };
-      var capF  = function (f) { return opts["capitals"] ? R.compose(capitalise, f) : f };
+      var numF  = n => opts["numbers"] ? randomNumericString(n) : emptyStringF;
+      var capF  = f => opts["capitals"] ? R.compose(capitalise, f) : f;
 
       var syll1 = [c1, v1, c2]; 
 
@@ -152,8 +140,8 @@ Generator = (function () {
     var randomWord = function (opts) {
 
       var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
-      var numF  = function (n) { return opts["numbers"] ? randomNumericString(n) : emptyStringF };
-      var capF  = function (f) { return opts["capitals"] ? R.compose(capitalise, f) : f };
+      var numF  = n => opts["numbers"] ? randomNumericString(n) : emptyStringF;
+      var capF  = f => opts["capitals"] ? R.compose(capitalise, f) : f;
 
       var syll = [capF(c1), v1, n];
 
@@ -219,8 +207,8 @@ Generator = (function () {
     var randomWord = function (opts) {
 
       var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
-      var numF  = function (n) { return opts["numbers"] ? randomNumericString(n) : emptyStringF };
-      var capF  = function (f) { return opts["capitals"] ? R.compose(capitalise, f) : f };
+      var numF  = n => opts["numbers"] ? randomNumericString(n) : emptyStringF;
+      var capF  = f => opts["capitals"] ? R.compose(capitalise, f) : f;
 
       var f;
       switch (dice(6)) {
@@ -303,8 +291,8 @@ Generator = (function () {
     // Generate a random word of a minimum and maximum length
     var randomWord = function (opts) {
       var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
-      var numF  = function (n) { return opts["numbers"] ? randomNumericString(n) : emptyStringF };
-      var capF  = opts["capitals"] ? function (f) { return R.compose(capitalise, f) } : R.identity ;
+      var numF  = n => opts["numbers"] ? randomNumericString(n) : emptyStringF;
+      var capF  = f => opts["capitals"] ? R.compose(capitalise, f) : f;
 
       var word = function () {
         var minLength = 5;
