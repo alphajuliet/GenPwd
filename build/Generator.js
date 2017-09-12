@@ -71,8 +71,8 @@ Generator = (function () {
 
   var symbols =  ["!","#","$","^","*","&", "+","@","-","=","/","~","?","\\","%","[","]","{","}","(",")"];
 
-  // emptyStringF :: () -> String
-  var emptyStringF = function () { return "" };
+  // emptyStringF :: * -> String
+  var emptyStringF = R.always("");
 
   // Functional "smarts"
   // Call each function in the list and concatenate the results.
@@ -111,7 +111,7 @@ Generator = (function () {
 
       var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
       var numF  = function (n) { return opts["numbers"] ? randomNumericString(n) : emptyStringF };
-      var capF  = opts["capitals"] ? function (f) { return R.compose(capitalise, f) } : R.identity ;
+      var capF  = function (f) { return opts["capitals"] ? R.compose(capitalise, f) : f };
 
       var syll1 = [c1, v1, c2]; 
 
@@ -153,7 +153,7 @@ Generator = (function () {
 
       var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
       var numF  = function (n) { return opts["numbers"] ? randomNumericString(n) : emptyStringF };
-      var capF  = opts["capitals"] ? function (f) { return R.compose(capitalise, f) } : R.identity ;
+      var capF  = function (f) { return opts["capitals"] ? R.compose(capitalise, f) : f };
 
       var syll = [capF(c1), v1, n];
 
@@ -162,7 +162,7 @@ Generator = (function () {
         case 0:  f = [syll, puncF, c1, v1]; break;
         case 1:  f = [syll, puncF, syll, c1, v1]; break;
         case 2:  f = [v1, syll, puncF, syll]; break;
-        case 3:  f = [punc, syll, syll]; break;
+        case 3:  f = [puncF, syll, syll]; break;
         default: f = [syll, syll, puncF]; break;
       }
 
@@ -220,7 +220,7 @@ Generator = (function () {
 
       var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
       var numF  = function (n) { return opts["numbers"] ? randomNumericString(n) : emptyStringF };
-      var capF  = opts["capitals"] ? function (f) { return R.compose(capitalise, f) } : R.identity ;
+      var capF  = function (f) { return opts["capitals"] ? R.compose(capitalise, f) : f };
 
       var f;
       switch (dice(6)) {
