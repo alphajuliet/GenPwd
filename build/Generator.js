@@ -94,9 +94,11 @@ Generator = (() => {
 
     var randomWord = (opts) => {
 
-      // puncF, numF, capF :: Object -> (() -> String)
+      // puncF :: Map String Boolean -> (() -> String)
       var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
+      // numF  :: Map String Boolean -> Integer -> (() -> String)
       var numF  = n => opts["numbers"] ? randomNumericString(n) : emptyStringF;
+      // capF  :: Map String Boolean -> (() -> String) -> (() -> String)
       var capF  = f => opts["capitals"] ? R.compose(capitalise, f) : f;
 
       var syll1 = [c1, v1, c2]; 
@@ -137,9 +139,11 @@ Generator = (() => {
 
     var randomWord = (opts) => {
 
-      // puncF, numF, capF :: Object -> (() -> String)
+      // puncF :: Map String Boolean -> (() -> String)
       var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
+      // numF  :: Map String Boolean -> Integer -> (() -> String)
       var numF  = n => opts["numbers"] ? randomNumericString(n) : emptyStringF;
+      // capF  :: Map String Boolean -> (() -> String) -> (() -> String)
       var capF  = f => opts["capitals"] ? R.compose(capitalise, f) : f;
 
       var syll = [capF(c1), v1, n];
@@ -205,9 +209,11 @@ Generator = (() => {
 
     var randomWord = (opts) => {
 
-      // puncF, numF, capF :: Object -> (() -> String)
+      // puncF :: Map String Boolean -> (() -> String)
       var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
+      // numF  :: Map String Boolean -> Integer -> (() -> String)
       var numF  = n => opts["numbers"] ? randomNumericString(n) : emptyStringF;
+      // capF  :: Map String Boolean -> (() -> String) -> (() -> String)
       var capF  = f => opts["capitals"] ? R.compose(capitalise, f) : f;
 
       var f;
@@ -291,11 +297,14 @@ Generator = (() => {
     // Generate a random word of a minimum and maximum length
     var randomWord = (opts) => {
       
-      // puncF, numF, capF :: Object -> (() -> String)
+      // puncF :: Map String Boolean -> (() -> String)
       var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
+      // numF  :: Map String Boolean -> Integer -> (() -> String)
       var numF  = n => opts["numbers"] ? randomNumericString(n) : emptyStringF;
+      // capF  :: Map String Boolean -> (() -> String) -> (() -> String)
       var capF  = f => opts["capitals"] ? R.compose(capitalise, f) : f;
 
+      // word :: () -> String
       var word = () => {
         var minLength = 5;
         var maxLength = 7;
