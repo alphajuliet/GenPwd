@@ -5,7 +5,7 @@
 // Namespace: Generator
 
 var Generator = Generator || {};
-Generator = (function () {
+Generator = (() => {
 
 
   // Capitalise a word
@@ -14,8 +14,8 @@ Generator = (function () {
 
   // Random number string in range [0, 10^n), padded to n digits
   // randomNumericString :: Integer -> (() -> String)
-  var randomNumericString = function (n) {
-    return function () {
+  var randomNumericString = (n) => {
+    return () => {
       var x = Math.random() * (Math.pow(10, n)-1);
       return String("0000000000" + x).slice(-n);
     };
@@ -23,36 +23,33 @@ Generator = (function () {
 
   // Random 0 to n-1
   // dice :: Integer -> Integer
-  var dice = n => Math.floor(Math.random() * n);
+  var dice = (n) => Math.floor(Math.random() * n);
 
-  // Wraps a function that returns a random element from the given list.
-  // RandomList :: Object -> (() -> String)
-  var RandomList = t => () => t[dice(t.length)];
+  // Returns a function that returns a random element from the given list.
+  // RandomList :: [a] -> (() -> a)
+  var RandomList = (t) => 
+    () => t[dice(t.length)];
 
   // Return a function that randomly selects elements from a weighted list.
   // A weighted list simply has more copies of higher weighted elements.
-  // WeightedList :: Object -> (() -> String)
-  var WeightedList = function (t) {
-
-    // Return an array of n copies of x.
-    // repeat :: String -> Integer -> [String]
-    var repeat = (x, n) => R.times(i => x, n);
+  // WeightedList :: Map String Integer -> (() -> String)
+  var WeightedList = (t) => {
 
     // Creates multiple versions of an element based on the count.
-    // e.g. {"a":2, "b":3} -> ["a", "a", "b", "b", "b"]
-    // expandedList :: Object -> [String]
-    var expandedList = R.chain(
-      p => repeat(p[0], p[1]),
-      R.toPairs(t)
+    // e.g. {"a": 2, "b": 3} -> ["a", "a", "b", "b", "b"]
+    // expandedList :: Map String Integer -> [String]
+    var expandedList = (m) => R.chain(
+      p => R.times(R.always(p[0]), p[1]),
+      R.toPairs(m)
     );
 
-    return RandomList(expandedList);
+    return RandomList(expandedList(t));
   };
 
   //---------------------------------
   // Transform a random element in an array
   // trRandElement :: (a -> a) -> [a] -> [a]
-  var trRandElement = R.curry(function (f, arr) { 
+  var trRandElement = R.curry((f, arr) => { 
     var idx = dice(arr.length);
     return R.join('', R.update(idx, f(arr[idx]), arr));
   });
@@ -71,7 +68,7 @@ Generator = (function () {
   // Generator 1
   // The original generator
 
-  var generator1 = (function () {
+  var generator1 = (() => {
     var c1 = WeightedList(
       {"b":2,"bl":1,"br":1,"c":2,"cr":1,"ch":2,"cl":1,"d":2,"f":2,"fl":1,
         "fr":1,"g":2,"gl":1,"gr":1,"h":1,"j":2,"k":2,"l":2,"m":3,"n":2,"p":2,
@@ -95,8 +92,9 @@ Generator = (function () {
       {"a":5,"ao":1,"e":5,"ea":1,"ee":2,"eo":1,"i":2,"ia":2,"io":2,"o":5,
         "oa":2,"oo":2,"ow":2,"ua":1,"uo":1,"y":5});
 
-    var randomWord = function (opts) {
+    var randomWord = (opts) => {
 
+      // puncF, numF, capF :: Object -> (() -> String)
       var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
       var numF  = n => opts["numbers"] ? randomNumericString(n) : emptyStringF;
       var capF  = f => opts["capitals"] ? R.compose(capitalise, f) : f;
@@ -127,7 +125,7 @@ Generator = (function () {
   // Generator 2
   // Pseudo-Japanese style
 
-  var generator2 = (function () {
+  var generator2 = (() => {
     var c1 = WeightedList(
       {"k":5,"g":5,"t":5,"d":5,"s":5,"z":4,"h":3,"b":3,
         "p":3,"n":3,"r":5,"m":5,"y":2,"gy":1,"j":2,"sh":2,
@@ -137,8 +135,9 @@ Generator = (function () {
     var n = WeightedList(
       {"":5, "n":1});
 
-    var randomWord = function (opts) {
+    var randomWord = (opts) => {
 
+      // puncF, numF, capF :: Object -> (() -> String)
       var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
       var numF  = n => opts["numbers"] ? randomNumericString(n) : emptyStringF;
       var capF  = f => opts["capitals"] ? R.compose(capitalise, f) : f;
@@ -177,7 +176,7 @@ Generator = (function () {
   // Generator 3
   // Another attempt at Englishy words
 
-  var generator3 = (function () {
+  var generator3 = (() => {
 
     // Consonants
     var c = WeightedList(
@@ -204,8 +203,9 @@ Generator = (function () {
       {"a":1,"e":1,"i":1,"o":1});
 
 
-    var randomWord = function (opts) {
+    var randomWord = (opts) => {
 
+      // puncF, numF, capF :: Object -> (() -> String)
       var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
       var numF  = n => opts["numbers"] ? randomNumericString(n) : emptyStringF;
       var capF  = f => opts["capitals"] ? R.compose(capitalise, f) : f;
@@ -233,7 +233,7 @@ Generator = (function () {
   // Generator 4
   // Markov chain generator
 
-  var generator4 = (function () {
+  var generator4 = (() => {
 
     // Generated Markov transition matrix for the given set.
     var allLetters = [' ', '_', "'", 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
@@ -272,7 +272,7 @@ Generator = (function () {
 
     // Return a random next letter, given the transition matrix
     // nextLetter :: Char -> [Char] -> [[Float]] -> Char
-    var nextLetter = function (tr_matrix, symbols, ltr) {
+    var nextLetter = (tr_matrix, symbols, ltr) => {
       var row_index = R.indexOf(ltr, symbols);
       var row = tr_matrix[row_index];
 
@@ -289,12 +289,14 @@ Generator = (function () {
     // var allLists = R.map(nextLetter(symbols, tr_matrix), symbols)
 
     // Generate a random word of a minimum and maximum length
-    var randomWord = function (opts) {
+    var randomWord = (opts) => {
+      
+      // puncF, numF, capF :: Object -> (() -> String)
       var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
       var numF  = n => opts["numbers"] ? randomNumericString(n) : emptyStringF;
       var capF  = f => opts["capitals"] ? R.compose(capitalise, f) : f;
 
-      var word = function () {
+      var word = () => {
         var minLength = 5;
         var maxLength = 7;
         var w = '';
