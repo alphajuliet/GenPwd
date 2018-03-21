@@ -7,21 +7,21 @@ var GenPwd = GenPwd || {};
 GenPwd = (() => {
 
   // Application metadata
-  var Info = {
+  const Info = {
     name: "GenPwd",
     author: "AndrewJ",
     version: "2.29",
     date: "2017-09-18",
     info: "GenPwd is a simple password generator.",
     appendTo: function (tagName) {
-      var str = "<div>";
+      let str = "<div>";
       str += "<span class='title'>" + this.name + "</span>";
       str += "&nbsp;<span class='description'>v" + this.version + "</span>";
       str += "</div>";
       $(tagName).append(str);
     },
     aboutText: function () {
-      var str = this.name + " v" + this.version;
+      let str = this.name + " v" + this.version;
       str += ", last modified: " + this.date;
       str += " by: " + this.author + ".\n\n";
       str += this.info;
@@ -47,8 +47,8 @@ GenPwd = (() => {
 
   // Main function to generate a list of random words, based on the chosen generator.
   var generate = (output, gen_opt, opts) => {
-    var nwords = 10;
-    var gen = Generator[gen_opt];
+    const nwords = 10;
+    const gen = Generator[gen_opt];
 
     $(output).empty();
     R.forEach( (i) => {

@@ -16,7 +16,7 @@ Generator = (() => {
   // randomNumericString :: Integer -> (() -> String)
   var randomNumericString = (n) => {
     return () => {
-      var x = Math.random() * (Math.pow(10, n)-1);
+      const x = Math.random() * (Math.pow(10, n)-1);
       return String("0000000000" + x).slice(-n);
     };
   };
@@ -50,7 +50,7 @@ Generator = (() => {
   // Transform a random element in an array
   // trRandElement :: (a -> a) -> [a] -> [a]
   var trRandElement = R.curry((f, arr) => { 
-    var idx = dice(arr.length);
+    const idx = dice(arr.length);
     return R.join('', R.update(idx, f(arr[idx]), arr));
   });
 
@@ -69,39 +69,39 @@ Generator = (() => {
   // The original generator
 
   var generator1 = (() => {
-    var c1 = WeightedList(
+    const c1 = WeightedList(
       {"b":2,"bl":1,"br":1,"c":2,"cr":1,"ch":2,"cl":1,"d":2,"f":2,"fl":1,
         "fr":1,"g":2,"gl":1,"gr":1,"h":1,"j":2,"k":2,"l":2,"m":3,"n":2,"p":2,
         "pl":1,"pr":1,"qu":1,"r":2,"s":3,"sh":2,"sk":1,"sl":1,"sm":1,"sn":1,
         "st":2,"str":1,"t":3,"th":2,"thr":1,"tr":2,"tw":1,"v":2,"w":1,"z":2});
-    var c2 = RandomList(
+    const c2 = RandomList(
       ["b","bl","br","cr","ch","cl","d","f","fl","fr","g","gg", "gl","gr",
         "h","j","k","l","m","n","p","pl","pp","pr","pt","qu","r","s","sh","sk",
         "sl","sm","sn","st","str","t","th","thr","tr","tw","v","w","z"]);
-    var c3 = WeightedList(
+    const c3 = WeightedList(
       {"b":1,"ch":1,"ck":1,"ct":1,"d":2,"dd":1,"f":1,"ff":1,"ft":1,"g":1,
         "k":1,"l":2,"ll":1,"lb":1,"ld":1,"lm":1,"ln":1,"lp":1,"lt":1,"m":3,
         "mp":1,"mt":1,"n":3,"nd":1,"ng":1,"nn":1,"nt":1,"p":2,"pp":1,"pt":1,
         "rd":1,"rg":1,"rk":1,"rn":1,"rr":1,"rs":1,"rt":1,"s":3,"sh":1,"ss":2,
         "st":2,"t":3,"tt":2,"th":2,"v":2,"wn":1});
-    var v1 = WeightedList(
+    const v1 = WeightedList(
       {"a":5,"aa":1,"ai":1,"e":5,"ea":1,"ee":1,"i":5,"o":5,"oo":2,"u":2});
-    var v2 = WeightedList(
+    const v2 = WeightedList(
       {"a":5, "e":5,"i":5, "ia":1, "o":5, "oa":1,"oo":2, "u":2, "ua":1});
-    var v3 = WeightedList(
+    const v3 = WeightedList(
       {"a":5,"ao":1,"e":5,"ea":1,"ee":2,"eo":1,"i":2,"ia":2,"io":2,"o":5,
         "oa":2,"oo":2,"ow":2,"ua":1,"uo":1,"y":5});
 
     var randomWord = (opts) => {
 
       // puncF :: Map String Boolean -> (() -> String)
-      var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
+      let puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
       // numF  :: Map String Boolean -> Integer -> (() -> String)
-      var numF  = n => opts["numbers"] ? randomNumericString(n) : emptyStringF;
+      let numF  = n => opts["numbers"] ? randomNumericString(n) : emptyStringF;
       // capF  :: Map String Boolean -> (() -> String) -> (() -> String)
-      var capF  = f => opts["capitals"] ? R.compose(capitalise, f) : f;
+      let capF  = f => opts["capitals"] ? R.compose(capitalise, f) : f;
 
-      var syll1 = [c1, v1, c2]; 
+      let syll1 = [c1, v1, c2]; 
 
       var f;
       switch (dice(8)) {
@@ -115,7 +115,7 @@ Generator = (() => {
         case 7:  f = [c1, v1, capF(c1), v1, c1, v1, puncF]; break;
         default: f = [c1, v1, puncF, capF(c3), v3]; break;
       }
-      var w = (dice(2) < 1) ?  [f, numF(2)] : [numF(2), f];
+      let w = (dice(2) < 1) ?  [f, numF(2)] : [numF(2), f];
       return crunch(w);
     };
 
@@ -128,25 +128,25 @@ Generator = (() => {
   // Pseudo-Japanese style
 
   var generator2 = (() => {
-    var c1 = WeightedList(
+    const c1 = WeightedList(
       {"k":5,"g":5,"t":5,"d":5,"s":5,"z":4,"h":3,"b":3,
         "p":3,"n":3,"r":5,"m":5,"y":2,"gy":1,"j":2,"sh":2,
         "ch":2,"ky":1,"hy":1,"ry":2,"my":1,"ny":1,"by":1,"py":1});
-    var v1 = WeightedList(
+    const v1 = WeightedList(
       {"a":2,"i":1,"u":2,"e":1,"o":2, "ou":1});
-    var n = WeightedList(
+    const n = WeightedList(
       {"":5, "n":1});
 
     var randomWord = (opts) => {
 
       // puncF :: Map String Boolean -> (() -> String)
-      var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
+      let puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
       // numF  :: Map String Boolean -> Integer -> (() -> String)
-      var numF  = n => opts["numbers"] ? randomNumericString(n) : emptyStringF;
+      let numF  = n => opts["numbers"] ? randomNumericString(n) : emptyStringF;
       // capF  :: Map String Boolean -> (() -> String) -> (() -> String)
-      var capF  = f => opts["capitals"] ? R.compose(capitalise, f) : f;
+      let capF  = f => opts["capitals"] ? R.compose(capitalise, f) : f;
 
-      var syll = [capF(c1), v1, n];
+      let syll = [capF(c1), v1, n];
 
       var f;
       switch (dice(4)) {
@@ -157,9 +157,9 @@ Generator = (() => {
         default: f = [syll, syll, puncF]; break;
       }
 
-      var g = (dice(2) < 1) ? [f, numF(2)] : [numF(2), f];
+      let g = (dice(2) < 1) ? [f, numF(2)] : [numF(2), f];
 
-      var w = crunch(g); // Turn into a string
+      let w = crunch(g); // Turn into a string
 
       w = w.replace(/[Tt]i/, "chi");
       w = w.replace(/[Ss]i/, "shi");
@@ -183,15 +183,15 @@ Generator = (() => {
   var generator3 = (() => {
 
     // Consonants
-    var c = WeightedList(
+    const c = WeightedList(
       {"k":5,"g":5,"t":5,"d":5,"s":5,"z":2,"b":4,
         "p":3,"n":4,"r":5,"m":4,"j":1,"sh":2,"l":2,"ch":2});
-    var ce = WeightedList(
+    const ce = WeightedList(
       {"ck":1,"g":3,"t":3,"d":3,"ss":2,"bb":1,
         "pp":1,"rp":1,"n":4,"th":1,"m":2,"sh":2,"ll":2,"ch":2,
         "st":2,"nt":2,"ft":1,"mt":1,"rk":2,"rm":1,"rn":1,"rs":1,"rt":2,
         "ng":2,"nch":1,"nd":1,"rd":1,"sk":1,"nce":1,"rce":1});
-    var cs = WeightedList(
+    const cs = WeightedList(
       {"k":5,"g":5,"t":5,"d":5,"s":5,"z":2,"b":4,
         "p":3,"n":4,"r":5,"m":4,"j":2,"sh":2,"l":2,"ch":2,
         "bl":1,"br":1,"dr":1,"fl":1,"fr":1,"gl":1,"gr":1,
@@ -199,22 +199,22 @@ Generator = (() => {
         "w":1});
 
     // Vowels
-    var vm = WeightedList(
+    const vm = WeightedList(
       {"a":4,"ai":1,"e":4,"ee":2,"io":1,"oo":2,"i":4,"o":4,"u":2});
-    var ve = WeightedList(
+    const ve = WeightedList(
       {"a":2,"ee":1,"i":2,"io":1,"o":2,"oo":1,"y":2});
-    var vs = WeightedList(
+    const vs = WeightedList(
       {"a":1,"e":1,"i":1,"o":1});
 
 
     var randomWord = (opts) => {
 
       // puncF :: Map String Boolean -> (() -> String)
-      var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
+      let puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
       // numF  :: Map String Boolean -> Integer -> (() -> String)
-      var numF  = n => opts["numbers"] ? randomNumericString(n) : emptyStringF;
+      let numF  = n => opts["numbers"] ? randomNumericString(n) : emptyStringF;
       // capF  :: Map String Boolean -> (() -> String) -> (() -> String)
-      var capF  = f => opts["capitals"] ? R.compose(capitalise, f) : f;
+      let capF  = f => opts["capitals"] ? R.compose(capitalise, f) : f;
 
       var f;
       switch (dice(6)) {
@@ -227,7 +227,7 @@ Generator = (() => {
         default: f = [capF(c), vm, c, vm, c, vm, ce]; break;
       }
 
-      var w = (dice(2) < 1) ? [f, puncF, numF(2)] : [numF(2), f, puncF];
+      let w = (dice(2) < 1) ? [f, puncF, numF(2)] : [numF(2), f, puncF];
       return crunch(w);
     };
 
@@ -242,9 +242,9 @@ Generator = (() => {
   var generator4 = (() => {
 
     // Generated Markov transition matrix for the given set.
-    var allLetters = [' ', '_', "'", 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+    const allLetters = [' ', '_', "'", 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
 
-    var tr = [
+    const tr = [
       [ 0.0001661183,0,0.001012786,0.1211592,0.04469118,0.03657282,0.02942973,0.01811225,0.03810004,0.01722272,0.06422884,0.07750222,0.002545361,0.005792706,0.02441939,0.05296494,0.01820335,0.06261052,0.02634315,0.002180972,0.0217347,0.07929201,0.1634068,0.01310727,0.007486041,0.06366618,0.0003590299,0.007630724,5.89452e-05],
       [ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
       [ 0.5013193,0,0,0.01846966,0.01583113,0.0237467,0.03166227,0.005277045,0.005277045,0.002638522,0.06860158,0.04221636,0,0,0.01583113,0.03430079,0.03166227,0.005277045,0.02638522,0,0.005277045,0.02110818,0.06596306,0,0.002638522,0.02902375,0,0.0474934,0],
@@ -278,16 +278,16 @@ Generator = (() => {
 
     // Return a random next letter, given the transition matrix
     // nextLetter :: Char -> [Char] -> [[Float]] -> Char
-    var nextLetter = (tr_matrix, symbols, ltr) => {
-      var row_index = R.indexOf(ltr, symbols);
-      var row = tr_matrix[row_index];
+    let nextLetter = (tr_matrix, symbols, ltr) => {
+      const row_index = R.indexOf(ltr, symbols);
+      const row = tr_matrix[row_index];
 
       // Round the probabilities to splits across 100
-      var roundf = R.flip(R.curry(Math.round));
-      var int_row = R.map(R.compose(roundf(1), R.multiply(200)), row);
+      const roundf = R.flip(R.curry(Math.round));
+      const int_row = R.map(R.compose(roundf(1), R.multiply(200)), row);
 
       // Generate a bag of letters and pick one
-      var listf = WeightedList(R.zipObj(symbols, int_row));
+      const listf = WeightedList(R.zipObj(symbols, int_row));
       return listf();
     };
 
@@ -298,17 +298,18 @@ Generator = (() => {
     var randomWord = (opts) => {
       
       // puncF :: Map String Boolean -> (() -> String)
-      var puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
+      let puncF = opts["punctuation"] ? RandomList(symbols) : emptyStringF;
       // numF  :: Map String Boolean -> Integer -> (() -> String)
-      var numF  = n => opts["numbers"] ? randomNumericString(n) : emptyStringF;
+      let numF  = n => opts["numbers"] ? randomNumericString(n) : emptyStringF;
       // capF  :: Map String Boolean -> (() -> String) -> (() -> String)
-      var capF  = f => opts["capitals"] ? R.compose(capitalise, f) : f;
+      let capF  = f => opts["capitals"] ? R.compose(capitalise, f) : f;
 
       // word :: () -> String
       var word = () => {
-        var minLength = 5;
-        var maxLength = 7;
+        const minLength = 5;
+        const maxLength = 7;
         var w = '';
+        var letter;
 
         do {
           letter = RandomList(R.slice(3, 29, allLetters))();
@@ -322,7 +323,7 @@ Generator = (() => {
         return w;
       }
 
-      var f = (dice(2) < 1) ? 
+      let f = (dice(2) < 1) ? 
         [capF(word), puncF, numF(3)] :
         [numF(3), puncF, capF(word)];
 
